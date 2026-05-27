@@ -201,6 +201,21 @@ body::after{content:"";position:fixed;inset:0;z-index:9000;pointer-events:none;o
 .lcard.heart .badge{animation:badgepulse 3.6s ease-in-out infinite}
 @keyframes badgepulse{0%,100%{box-shadow:0 0 0 0 rgba(236,228,139,.35)}50%{box-shadow:0 0 0 9px rgba(236,228,139,0)}}
 
+/* ===== 実例カード ===== */
+.ex{display:grid;gap:18px}
+.exc{border:1px solid var(--line);border-radius:11px;background:rgba(12,44,77,.42);overflow:hidden;transition:border-color .4s ease,opacity 1.1s var(--ease-out),transform 1.1s var(--ease-out),filter 1.1s var(--ease-out)}
+.exc:hover{border-color:var(--cyan)}
+.exc .exh{display:flex;align-items:center;gap:11px;padding:13px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.exc .exh h4{font-weight:700;color:#fff;font-size:1rem}
+.exbadge{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:.6rem;border:1px solid var(--line);color:var(--cyan-soft);border-radius:99px;padding:2px 9px}
+.exbadge.h{border-color:var(--gold-deep);color:var(--gold)}
+.exc .fn{color:var(--ink-dim);font-family:"JetBrains Mono",monospace;font-size:.72rem;margin-left:auto}
+.exc pre{margin:0;padding:16px 18px;overflow-x:auto;background:rgba(0,0,0,.4);font-family:"JetBrains Mono",monospace;font-size:.76rem;line-height:1.75;color:var(--cyan-soft);white-space:pre}
+.exc pre .c{color:var(--ink-dim)}
+.exc pre .k{color:var(--gold)}
+.exc pre .v{color:#fff}
+.exc .cap{padding:13px 18px;font-size:.84rem;color:var(--ink-dim);line-height:1.6}
+.exc .cap b{color:var(--cyan-soft);font-weight:500}
 footer{text-align:center;padding:54px 22px 60px;border-top:1px solid var(--line);color:var(--ink-dim)}
 footer .q{font-family:"Cinzel",serif;font-size:clamp(1rem,3vw,1.5rem);color:#fff;letter-spacing:.04em;max-width:30ch;margin:0 auto 12px}
 footer .fp{max-width:54ch;margin:0 auto;font-size:.9rem}
@@ -232,6 +247,7 @@ footer .meta{font-family:"JetBrains Mono",monospace;font-size:.6rem;opacity:.55;
   <button class="tab" role="tab" aria-selected="true" data-p="overview"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>概要</button>
   <button class="tab" role="tab" aria-selected="false" data-p="layers"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>6つの層</button>
   <button class="tab" role="tab" aria-selected="false" data-p="how"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>動きのしくみ</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="examples"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>実例</button>
   <button class="tab" role="tab" aria-selected="false" data-p="skills"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l2.5 6.5L21 9l-5 4 1.8 7L12 16l-5.8 4L8 13 3 9l6.5-.5z"/></svg>スキル <span class="n">17</span></button>
   <button class="tab" role="tab" aria-selected="false" data-p="agents"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15.5 20c0-2 .8-3.8 2-5"/></svg>助っ人AI <span class="n">144</span></button>
   <button class="tab" role="tab" aria-selected="false" data-p="mcp"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12a7 7 0 0114 0"/><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="19" r="2"/><path d="M12 5V3M12 17v-7"/></svg>外部連携 <span class="n">7</span></button>
@@ -393,6 +409,90 @@ footer .meta{font-family:"JetBrains Mono",monospace;font-size:.6rem;opacity:.55;
       <span class="chip">入力ごと：状況を追記する</span>
       <span class="chip">終わり：要点を残す</span>
     </div>
+  </div>
+</section>
+
+<!-- ============ 実例 ============ -->
+<section class="panel" id="examples" role="tabpanel">
+  <div class="phead reveal">
+    <p class="eb">// Concrete Examples</p>
+    <h2>One Example Each<span class="h2ja">実例 — 各層が扱う実際の成果物を1つずつ</span></h2>
+    <p>抽象的な説明を裏づけるため、各層が実際に読み書きするファイル・設定を1例ずつ示します。すべて本構成からの実物です。</p>
+  </div>
+  <div class="ex">
+
+    <div class="exc reveal">
+      <div class="exh"><span class="exbadge">層①</span><h4>静的設定</h4><span class="fn">CLAUDE.md</span></div>
+      <pre><span class="c">## サブエージェント運用</span>
+<span class="k">@</span>~/.claude/rules/AUTHORITY.md
+<span class="k">@</span>~/.claude/rules/subagent-delegation.md
+<span class="c"># 144体カタログは重いため @import せず、必要時に Read（オンデマンド）</span></pre>
+      <div class="cap"><b>なぜ</b>：起動時に必ず読む土台。重い一覧を常時読み込むと文脈が圧迫され参照精度が落ちるため、必要時のみ読み込む。</div>
+    </div>
+
+    <div class="exc reveal">
+      <div class="exh"><span class="exbadge">層②</span><h4>記憶</h4><span class="fn">memory/feedback_*.md</span></div>
+      <pre><span class="c">---</span>
+<span class="k">name:</span> 新規UIデザインは3段パイプライン必須
+<span class="k">description:</span> design-creator → design-library補強 → frontend-design の順
+<span class="k">metadata:</span>
+  <span class="k">type:</span> feedback
+<span class="c">---</span>
+新規UIは creator → library補強 → frontend-design の順で回す。
+<span class="k">**Why**</span>：役割分離が崩れると一貫性と再利用性が失われる。</pre>
+      <div class="cap"><b>なぜ</b>：会話をまたいで残す事実。種類で分類し、判断の理由（Why）まで記録して次回以降に再利用する。</div>
+    </div>
+
+    <div class="exc reveal">
+      <div class="exh"><span class="exbadge h">層③</span><h4>自動で動くしくみ（フック）</h4><span class="fn">settings.json</span></div>
+      <pre><span class="k">"hooks"</span>: {
+  <span class="k">"UserPromptSubmit"</span>: [{ "hooks": [
+    { "command": <span class="v">"python3 ~/.claude/scripts/context-router-v2.py"</span> }
+  ]}],                          <span class="c">// 入力のたびに関連情報を選別注入</span>
+  <span class="k">"SessionStart"</span>: [{ "hooks": [
+    { "command": <span class="v">"python3 ~/.claude/scripts/pool-loader.py"</span> }
+  ]}],                          <span class="c">// 開始時に共有メモを読込</span>
+  <span class="k">"Stop"</span>: [{ "hooks": [
+    { "command": <span class="v">"python3 ~/.claude/scripts/pool-extractor.py"</span> }
+  ]}]                           <span class="c">// 終了時に要点を記録</span>
+}</pre>
+      <div class="cap"><b>なぜ</b>：これらはモデルの判断に依存せず、指定タイミングで<b>必ず実行される</b>（決定論的）。確実性が要る処理を、確率的な自然言語指示と分けてここに置く。</div>
+    </div>
+
+    <div class="exc reveal">
+      <div class="exh"><span class="exbadge">層④</span><h4>実行（サブエージェント委任）</h4><span class="fn">Agent()</span></div>
+      <pre><span class="c">// コード変更後、独立した文脈で2観点を並列レビュー</span>
+Agent(<span class="k">code-reviewer</span>)      ← "認証まわりの差分をレビュー"
+Agent(<span class="k">architect-reviewer</span>) ← "層構成の妥当性を確認"
+<span class="c">// 各自の文脈で実行し、結論の要約だけが本会話へ戻る</span></pre>
+      <div class="cap"><b>なぜ</b>：144体から専門家を選んで委任。中間処理は隔離されるため、大量の調査をしても本会話の文脈を占有しない。</div>
+    </div>
+
+    <div class="exc reveal">
+      <div class="exh"><span class="exbadge">層⑤</span><h4>運用・自己点検</h4><span class="fn">tasks/board.md</span></div>
+      <pre><span class="k">- [ ] [alert]</span> refs: CLAUDE.md スキル索引に design-creator 未記載
+  重大度: <span class="v">WARN</span>
+  冪等キー: refs:CLAUDE.md-skills-index:8f3ffa6a
+  推奨対応: ## スキル に2行追記</pre>
+      <div class="cap"><b>なぜ</b>：健康診断が見つけた不整合を看板へ自動登録。<b>実際にこの仕組みが、本ページ制作中の索引漏れを検出した。</b></div>
+    </div>
+
+    <div class="exc reveal">
+      <div class="exh"><span class="exbadge">層⑥</span><h4>判断のルール</h4><span class="fn">AUTHORITY.md</span></div>
+      <pre>git status / log / diff        <span class="c">→</span> <span style="color:var(--green)">緑</span>（無確認）
+git commit（ユーザー指示時）   <span class="c">→</span> <span style="color:var(--yellow)">黄</span>（確認）
+rm -rf ／ push --force to main <span class="c">→</span> <span style="color:var(--red)">赤</span>（禁止）</pre>
+      <div class="cap"><b>なぜ</b>：可逆性×影響範囲で判定。不可逆・高影響な操作は、確率的な指示遵守に委ねず人間の確認を必須化する。</div>
+    </div>
+
+    <div class="exc reveal">
+      <div class="exh"><span class="exbadge">MCP</span><h4>外部連携</h4><span class="fn">MCP servers</span></div>
+      <pre>context7          <span class="c">→</span> ライブラリの最新ドキュメントを取得
+playwright        <span class="c">→</span> ブラウザでページを操作・スクショ
+supabase（読取）   <span class="c">→</span> <span style="color:var(--green)">緑</span>  ／  supabase（更新系） <span class="c">→</span> <span style="color:var(--yellow)">黄</span></pre>
+      <div class="cap"><b>なぜ</b>：標準プロトコル（MCP）経由で外部接続。読み取りは無確認、書き込み・更新は決裁層のルールに従う。</div>
+    </div>
+
   </div>
 </section>
 
