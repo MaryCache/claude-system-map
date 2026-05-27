@@ -45,7 +45,8 @@ body::after{content:"";position:fixed;inset:0;z-index:9000;pointer-events:none;o
 
 /* ===== タブナビ ===== */
 .tabs{position:sticky;top:0;z-index:100;background:rgba(2,10,20,.82);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:30px}
-.tabs .inner{max-width:var(--maxw);margin:0 auto;display:flex;gap:2px;overflow-x:auto;padding:0 10px;scrollbar-width:thin}
+.tabs .inner{max-width:var(--maxw);margin:0 auto;display:flex;gap:2px;overflow-x:auto;padding:0 10px;scrollbar-width:none;-ms-overflow-style:none}
+.tabs .inner::-webkit-scrollbar{display:none}
 .tab{flex:0 0 auto;background:none;border:none;color:var(--ink-dim);font-family:"Noto Sans JP";font-weight:500;font-size:.9rem;padding:16px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;display:flex;align-items:center;gap:8px}
 .tab .ti{width:17px;height:17px;flex:0 0 auto}
 .tab:hover{color:var(--cyan-soft)}
