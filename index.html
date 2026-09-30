@@ -137,7 +137,8 @@ p{margin:0;text-wrap:pretty}
 .fig-head .lead{grid-column:1;max-width:44em;margin-top:12px;color:var(--ink-dim)}
 .fig-head .avatar,.fig-head .sprite{grid-column:2;grid-row:1 / span 3;align-self:end}
 /* ドット絵のモネ：1マス1画素の原画を整数倍（3倍）で拡大し、ぼかさない。見出しの横では胸から上だけを窓で見せる */
-.sprite{--s:3;width:calc(var(--w) * var(--s) * 1px);height:calc(var(--rows) * var(--s) * 1px);overflow:hidden;flex:none;border-bottom:1px solid var(--ink)}
+/* 2倍: ドット絵は 100×190 ドット級（参照画像つきで作り直した 2026-09-30 版）。3倍だとスマホ幅からはみ出す */
+.sprite{--s:2;width:calc(var(--w) * var(--s) * 1px);height:calc(var(--rows) * var(--s) * 1px);overflow:hidden;flex:none;border-bottom:1px solid var(--ink)}
 .sprite img{width:calc(var(--w) * var(--s) * 1px);height:calc(var(--h) * var(--s) * 1px);max-width:none;image-rendering:pixelated;margin-left:calc(var(--dx, 0) * var(--s) * -1px)}
 .avatar{width:72px;height:72px;border-radius:50%;overflow:hidden;background:var(--surface-2);box-shadow:0 0 0 1px var(--line), 0 0 0 5px var(--ivory), 0 0 0 6px var(--line)}
 .avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}
@@ -838,7 +839,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
       <p class="fig-no">図B</p>
       <h2 id="fig-b-title">1回の会話で起きること</h2>
       <p class="lead">会話の各場面で、自動スイッチ（フック）が順に働きます。左から右へ、はじまり → 準備 → 実行 → 睡眠。各場面の下に、そこで発火するフックを吊るしています。</p>
-      <div class="sprite" style="--w:76;--h:138;--rows:58;--hw:47;--hdx:14;--hrows:47"><img src="assets/monet/pixel/monet-idle.png" width="76" height="138" alt="微笑むモネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:104;--h:195;--rows:82;--hw:64;--hdx:20;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="微笑むモネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <ol class="scenes" aria-label="会話の流れ">
@@ -905,7 +906,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
       <p class="fig-no">図C</p>
       <h2 id="fig-c-title">誰に仕事を振るか</h2>
       <p class="lead">真ん中が本流（最終判断）。左は Claude のサブエージェント、右は別のモデルに「区切られた仕事」を1本ずつ委ねる外部モデルワーカーです。ワーカーが在るという理由では委任せず、Haiku では弱いが本流を回すほどでもない中量級だけを対象にします。呼び出し側の殻は軽量モデルで、実処理は各ワーカーのモデルが担います。</p>
-      <div class="sprite" style="--w:76;--h:138;--rows:58;--hw:47;--hdx:14;--hrows:47"><img src="assets/monet/pixel/monet-idle.png" width="76" height="138" alt="考え中のモネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:104;--h:195;--rows:82;--hw:64;--hdx:20;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="考え中のモネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <p class="picker-label"><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>どこへ振るか（早見）— 課題の型を選ぶと、行き先まで線が走ります</p>
@@ -1024,7 +1025,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
       <p class="fig-no">図D</p>
       <h2 id="fig-d-title">判断のルール — 自律の範囲</h2>
       <p class="lead">AIの暴走を防ぐための線引きです。信号機の色で「自ら決定してよい／確認のうえ実行／絶対に行わない」を区分します。上から順に読みます：まず「常に赤」、次に可逆性×影響範囲の表。判断に迷う場合は、必ず黄（確認）に倒します。</p>
-      <div class="sprite" style="--w:76;--h:138;--rows:58;--hw:47;--hdx:14;--hrows:47"><img src="assets/monet/pixel/monet-idle.png" width="76" height="138" alt="指さしで説明するモネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:100;--h:191;--rows:80;--hw:62;--hdx:19;--hrows:65"><img src="assets/monet/pixel/monet-point.png" width="100" height="191" alt="指さしで説明するモネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <div class="always-red">
@@ -1080,7 +1081,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
       <p class="fig-no">図E</p>
       <h2 id="fig-e-title">フォルダ構成 — 実際のファイル配置</h2>
       <p class="lead">システムを構成する <span class="mono">~/.claude/</span> 配下の実際のディレクトリ構造です。右端のバッジは各ファイルが対応する層で、押すと図A のその層へ戻ります。</p>
-      <div class="sprite" style="--w:76;--h:138;--rows:58;--hw:47;--hdx:14;--hrows:47"><img src="assets/monet/pixel/monet-idle.png" width="76" height="138" alt="資料を持つモネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:104;--h:195;--rows:82;--hw:64;--hdx:20;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="資料を持つモネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <div class="tree">
@@ -1136,7 +1137,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
       <p class="fig-no">一覧</p>
       <h2 id="lists-title">スキルと助っ人AIの全部</h2>
       <p class="lead">図から降りてくる二次層です。名前・説明で絞り込めます。</p>
-      <div class="sprite" style="--w:76;--h:138;--rows:58;--hw:47;--hdx:14;--hrows:47"><img src="assets/monet/pixel/monet-idle.png" width="76" height="138" alt="モネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:104;--h:195;--rows:82;--hw:64;--hdx:20;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="モネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <div class="lists">
@@ -1197,7 +1198,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
 <footer class="site-foot">
   <div class="wrap-wide foot-grid">
-<div class="sprite" style="--w:76;--h:138;--rows:58;--hw:47;--hdx:14;--hrows:47"><img src="assets/monet/pixel/monet-idle.png" width="76" height="138" alt="モネ（ドット絵）" loading="lazy"></div>
+<div class="sprite" style="--w:104;--h:195;--rows:82;--hw:64;--hdx:20;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="モネ（ドット絵）" loading="lazy"></div>
     <div>
       <p class="foot-q">静かに壊れない仕組みを。</p>
       <p class="foot-p">「自律型AIエージェント組織」の運用化を目指した構成です。記録による引き継ぎ・眠りによる整理・定期点検により、セッションごとに7層が連携し、システムの健全性を維持します。案内役のモネは、この構成の上で実際に動いている人格です。</p>

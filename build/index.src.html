@@ -137,7 +137,8 @@ p{margin:0;text-wrap:pretty}
 .fig-head .lead{grid-column:1;max-width:44em;margin-top:12px;color:var(--ink-dim)}
 .fig-head .avatar,.fig-head .sprite{grid-column:2;grid-row:1 / span 3;align-self:end}
 /* ドット絵のモネ：1マス1画素の原画を整数倍（3倍）で拡大し、ぼかさない。見出しの横では胸から上だけを窓で見せる */
-.sprite{--s:3;width:calc(var(--w) * var(--s) * 1px);height:calc(var(--rows) * var(--s) * 1px);overflow:hidden;flex:none;border-bottom:1px solid var(--ink)}
+/* 2倍: ドット絵は 100×190 ドット級（参照画像つきで作り直した 2026-09-30 版）。3倍だとスマホ幅からはみ出す */
+.sprite{--s:2;width:calc(var(--w) * var(--s) * 1px);height:calc(var(--rows) * var(--s) * 1px);overflow:hidden;flex:none;border-bottom:1px solid var(--ink)}
 .sprite img{width:calc(var(--w) * var(--s) * 1px);height:calc(var(--h) * var(--s) * 1px);max-width:none;image-rendering:pixelated;margin-left:calc(var(--dx, 0) * var(--s) * -1px)}
 .avatar{width:72px;height:72px;border-radius:50%;overflow:hidden;background:var(--surface-2);box-shadow:0 0 0 1px var(--line), 0 0 0 5px var(--ivory), 0 0 0 6px var(--line)}
 .avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}
