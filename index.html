@@ -293,6 +293,22 @@ p{margin:0;text-wrap:pretty}
 .sub-block > h3{font-size:19px}
 .sub-block > .note:first-of-type{margin-top:8px}
 
+/* 図B のフック一覧：番号／タイミング（下に小さくイベント名）／スクリプト名と説明。SP では番号とタイミングを1行目、説明を2行目にする */
+.hook-table{list-style:none;margin:14px 0 0;padding:0;border-top:1px solid var(--ink)}
+.hook-table li{display:grid;grid-template-columns:2em minmax(9em,.32fr) minmax(0,1fr);gap:4px 16px;padding:12px 0;border-bottom:1px solid color-mix(in oklab,var(--grey) 45%,transparent);font-size:14.5px;line-height:1.75}
+.hk-no{font-family:var(--font-mono);color:var(--terra);font-variant-numeric:tabular-nums}
+.hk-when{font-weight:600}
+.hk-when small{display:block;font-family:var(--font-mono);font-weight:400;font-size:12px;color:var(--ink-dim)}
+.hk-body .mono{display:block;font-weight:500;margin-bottom:2px}
+/* 看板の5段：名前と意味の組を縦に並べる（かしぇ「名前：意味の方が読みやすい」） */
+.board-stages{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:0;max-width:34em;border-top:1px solid var(--ink)}
+.board-stages li{display:grid;grid-template-columns:9em 1fr;gap:12px;padding:8px 0;border-bottom:1px solid color-mix(in oklab,var(--grey) 45%,transparent);font-size:14.5px}
+.board-stages b{font-family:var(--font-sans);font-weight:600}
+@media (max-width:860px){
+  .hook-table li{grid-template-columns:2em minmax(0,1fr)}
+  .hk-body{grid-column:2}
+}
+
 /* ratio-bar */
 .ratio{margin-top:18px}
 .ratio-track{display:flex;height:44px;border-radius:var(--radius-node);overflow:hidden;border:1px solid var(--ink);transform-origin:left;transition:transform .8s cubic-bezier(.02,.88,.58,1)}
@@ -1021,7 +1037,34 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         </details>
       </li>
     </ol>
-    <p class="note">睡眠は、論文「Language Models Need Sleep」の考え方を運用の手順で近似したものです。手動の <span class="mono">/sleep</span> と、コンテキスト圧縮の直前に実行されるフック（直近の実行から5分以内なら何もせずに終了）の2つの入口から、同じ6手順を踏みます。フックは6種類のタイミングで計8本あり、上の図にはそのうち主な6本を載せています。</p>
+    <p class="note">睡眠は、論文「Language Models Need Sleep」の考え方を運用の手順で近似したものです。手動の <span class="mono">/sleep</span> と、コンテキスト圧縮の直前に実行されるフック（直近の実行から5分以内なら何もせずに終了）の2つの入口から、同じ6手順を踏みます。フックは6種類のタイミングで計8本あり、上の図にはそのうち主な6本を載せています。8本すべては下の一覧にあります。</p>
+
+    <div class="sub-block" id="fig-b-hooks">
+      <h3>フック8本の一覧</h3>
+      <p class="note">フックは、Claude Codeが決まったタイミングで自動実行するコマンドで、settings.jsonに登録しています。</p>
+      <ol class="hook-table">
+        <li><span class="hk-no">1</span><span class="hk-when">会話を始めたとき<small>SessionStart</small></span><span class="hk-body"><span class="mono">session-start.py</span>人格の設定ファイルと看板の冒頭を読み込み、会話の最初に差し込みます。</span></li>
+        <li><span class="hk-no">2</span><span class="hk-when">メッセージを送るたび<small>UserPromptSubmit</small></span><span class="hk-body"><span class="mono">context-pressure.py</span>コンテキストの使用率を見て、80%と90%を超えたときに1回ずつ、Claudeに区切りの準備を促します。90%では、睡眠で記憶と看板に書き出してから、人間に/compactか新しい会話への移行を提案させます。</span></li>
+        <li><span class="hk-no">3</span><span class="hk-when">メッセージを送るたび<small>UserPromptSubmit</small></span><span class="hk-body"><span class="mono">persona-reminder.py</span>2と同じタイミングで動く別のスクリプトです。人格を毎回差し込み直して、話し方がぶれないようにします。</span></li>
+        <li><span class="hk-no">4</span><span class="hk-when">ファイルの読み書きやコマンドを実行する直前<small>PreToolUse</small></span><span class="hk-body"><span class="mono">pre-tool-guard.py</span><span class="mono" style="display:inline;font-weight:400">rm -rf</span>や設定ファイルの削除など、禁止と決めた操作をコードで止めます。</span></li>
+        <li><span class="hk-no">5</span><span class="hk-when">サブエージェントを呼ぶ直前<small>PreToolUse</small></span><span class="hk-body"><span class="mono">log-agent-model.py</span>4と同じ種類のタイミングで、対象をサブエージェントの呼び出しに絞っています。どのサブエージェントがどのモデルで動いたかを記録し、重いモデルに偏っていないか、どの委任先が実際に役に立っているかを数字で見直せるようにします。</span></li>
+        <li><span class="hk-no">6</span><span class="hk-when">ファイルを書き換えたあと<small>PostToolUse</small></span><span class="hk-body"><span class="mono">open-in-vscode.sh</span>書き換えたファイルをVS Codeで開きます。Claudeが何を書き換えたかを、人間がすぐ目で確かめるためです。</span></li>
+        <li><span class="hk-no">7</span><span class="hk-when">返事を書き終えたとき<small>Stop</small></span><span class="hk-body"><span class="mono">context-pressure.py</span>2と同じスクリプトです。ここでは90%を超えたときだけ動きます。</span></li>
+        <li><span class="hk-no">8</span><span class="hk-when">コンパクトの直前<small>PreCompact</small></span><span class="hk-body"><span class="mono">pre-compact-sleep.sh</span>Claudeに「睡眠」の手順を指示します。睡眠では、その会話で決まったことや分かったことを記憶ファイルと看板に書き出し、最後に設定をgitに保存します。5分以内に睡眠を済ませていれば、何もせず終わります。</span></li>
+      </ol>
+    </div>
+
+    <div class="sub-block" id="fig-b-board">
+      <h3>看板の5段</h3>
+      <p class="note">看板はmdファイル（<span class="mono">~/.claude/ops/board.md</span>）で、会話をまたいで全プロジェクトのタスクをまとめて管理するタスクボードです。タスクを1行ずつ書き、次の5段に分けています。</p>
+      <ul class="board-stages">
+        <li><b>Backlog</b><span>未実施</span></li>
+        <li><b>In Progress</b><span>作業中</span></li>
+        <li><b>Blocked</b><span>保留</span></li>
+        <li><b>Review</b><span>レビュー待ち</span></li>
+        <li><b>Done</b><span>終了済</span></li>
+      </ul>
+    </div>
 
     <div class="sub-block">
       <h3>モデルの使い分け（重さは難度で決める）</h3>
