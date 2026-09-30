@@ -7,4 +7,5 @@
 </g>
 <path id="wm-spine" class="wm-spine" fill="#C25A3F" d="M1656.1 126.0H1908.9V2187.6H1656.1Z"/>
 <path id="wm-elbow" class="wm-elbow" fill="#C25A3F" d="M1656.1 2187.6H18179.5V2410.1H1656.1Z"/>
+<path id="wm-flow" class="flow" fill="none" stroke-width="222.5" pathLength="100" d="M1782.5 126.0V2298.8H18179.5"/>
 </svg>

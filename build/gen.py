@@ -26,8 +26,28 @@ for n in range(1,8):
 tile='assets/illust/paper-tile.webp' if os.path.exists(f'{ROOT}/assets/illust/paper-tile.webp') else None
 s=s.replace('  /* PAPER_TILE */\n', f'  background-image:url("{tile}");background-size:600px 600px;\n' if tile else '')
 
-# ヘッダーは文字ロゴだけ（シンボルはファビコンと OG に回す・かしぇ 2026-09-30）。リンク側に aria-label があるので、
-# 埋め込む SVG は読み上げから外す。部品の id（wm-*）はページ内で一意なのでそのまま残し、動きの CSS から指す
+# ヘッダーはシンボル＋文字ロゴ（一度は文字ロゴだけにしたが、かしぇ「左にもともとのロゴもほしい」2026-09-30）。
+# シンボルは動かすために部品へ分ける：横棒（本文色）／縦の線／右へ折れる線。logo-lab の書き出しは差し色を1本のパス
+# （縦線と折れの2つの部分パス）で出すので、Z の直後の M で割る。割れない形なら差し色は1本のまま使う
+sym=open(f'{ROOT}/assets/logo/system-map-symbol.svg',encoding='utf-8').read().strip()
+sym=sym.replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">','<svg class="brand-symbol" viewBox="0 0 100 100" aria-hidden="true" focusable="false">')
+m=re.search(r'<path fill="(#[0-9A-Fa-f]{6})" d="([^"]+)"/><path fill="(#[0-9A-Fa-f]{6})" d="([^"]+)"/>',sym)
+if m:
+    parts=[p.strip() for p in re.split(r'Z\s*(?=M)',m[4]) if p.strip()]
+    parts=[p if p.endswith('Z') else p+' Z' for p in parts]
+    acc=(f'<path class="sy-spine" fill="{m[3]}" d="{parts[0]}"/><path class="sy-elbow" fill="{m[3]}" d="{parts[1]}"/>'
+         if len(parts)==2 else f'<path class="sy-spine" fill="{m[3]}" d="{m[4]}"/>')
+    sym=sym.replace(m[0],f'<path class="sy-bars" fill="{m[1]}" d="{m[2]}"/>'+acc)
+    # ホバーで光を走らせる道筋（縦線の中心を降り、折れの中心で右へ）。部分パスの頂点から寸法を取る
+    if len(parts)==2:
+        num=lambda p:[float(v) for v in re.findall(r'-?[\d.]+',p)]
+        sx,sy=num(parts[0])[0::2],num(parts[0])[1::2]
+        ex,ey=num(parts[1])[0::2],num(parts[1])[1::2]
+        cx=(min(sx)+max(sx))/2; cy=(min(ey)+max(ey))/2
+        w=min(max(sx)-min(sx),max(ey)-min(ey))
+        sym=sym.replace('</svg>',f'<path class="flow sy-flow" fill="none" stroke-width="{w:.2f}" pathLength="100" d="M{cx:.2f} {min(sy):.2f}V{cy:.2f}H{max(ex):.2f}"/></svg>')
+s=s.replace('{{SYMBOL_SVG}}',sym)
+# リンク側に aria-label があるので、埋め込む SVG は読み上げから外す。部品の id（wm-*）はページ内で一意なのでそのまま残し、動きの CSS から指す
 wm=open(f'{ROOT}/assets/logo/system-map-wordmark.svg',encoding='utf-8').read().strip()
 wm=wm.replace('xmlns="http://www.w3.org/2000/svg" ','').replace(' role="img" aria-label="Claude System Map"',' aria-hidden="true" focusable="false"')
 s=s.replace('{{WORDMARK_SVG}}',wm)

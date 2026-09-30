@@ -108,6 +108,9 @@ p{margin:0;text-wrap:pretty}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
 /* 文字ロゴの高さ。線の折れ（ディセンダーの下）まで含めた高さなので、字の大きさは本文の見出し程度になる */
 .brand svg{height:28px;width:auto;display:block;overflow:visible}
+/* シンボルも高さ 28px。図形の上下（縦線の上端・折れの下端）が枠の 3〜94% にあり、文字ロゴの線の上端・下端とほぼ同じ高さに揃う
+   ＝2つの「右へ折れる線」が同じ高さに並ぶ */
+.brand .brand-symbol{width:28px}
 .site-nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
 .site-nav::-webkit-scrollbar{display:none}
 .site-nav a{
@@ -138,8 +141,9 @@ p{margin:0;text-wrap:pretty}
 .fig-head .avatar,.fig-head .sprite{grid-column:2;grid-row:1 / span 3;align-self:end}
 /* ドット絵のモネ：1マス1画素の原画を整数倍（3倍）で拡大し、ぼかさない。見出しの横では胸から上だけを窓で見せる */
 /* 2倍: ドット絵は 100×190 ドット級（参照画像つきで作り直した 2026-09-30 版）。3倍だとスマホ幅からはみ出す */
-.sprite{--s:2;width:calc(var(--w) * var(--s) * 1px);height:calc(var(--rows) * var(--s) * 1px);overflow:hidden;flex:none;border-bottom:1px solid var(--ink)}
-.sprite img{width:calc(var(--w) * var(--s) * 1px);height:calc(var(--h) * var(--s) * 1px);max-width:none;image-rendering:pixelated;margin-left:calc(var(--dx, 0) * var(--s) * -1px)}
+/* --head: 頭上の余白（ドット）。ホバーで上へ跳ねても頭が窓の上で切れないように取る */
+.sprite{--s:2;--head:3;width:calc(var(--w) * var(--s) * 1px);height:calc((var(--rows) + var(--head)) * var(--s) * 1px);overflow:hidden;flex:none;border-bottom:1px solid var(--ink)}
+.sprite img{width:calc(var(--w) * var(--s) * 1px);height:calc(var(--h) * var(--s) * 1px);max-width:none;image-rendering:pixelated;margin-left:calc(var(--dx, 0) * var(--s) * -1px);margin-top:calc(var(--head) * var(--s) * 1px)}
 .avatar{width:72px;height:72px;border-radius:50%;overflow:hidden;background:var(--surface-2);box-shadow:0 0 0 1px var(--line), 0 0 0 5px var(--ivory), 0 0 0 6px var(--line)}
 .avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}
 
@@ -567,7 +571,7 @@ p{margin:0;text-wrap:pretty}
   /* スマホの見出しのモネは 4/3 倍。2倍だと見出しの列が狭くなり「フォルダ構／成」と割れた。
      DPR 3 の端末（iPhone など）では 1ドット＝ちょうど4画素になり、ぼけない */
   .fig-head .sprite{--s:1.3334}
-  .fig-head .sprite{width:calc(var(--hw) * var(--s) * 1px);height:calc(var(--hrows) * var(--s) * 1px)}
+  .fig-head .sprite{width:calc(var(--hw) * var(--s) * 1px);height:calc((var(--hrows) + var(--head)) * var(--s) * 1px)}
   .fig-head .sprite img{margin-left:calc(var(--hdx) * var(--s) * -1px)}
   .always-red{grid-template-columns:1fr}
   .always-red .icon{grid-row:auto}
@@ -629,10 +633,19 @@ p{margin:0;text-wrap:pretty}
 .trace.pre .stub,.trace.pre .elbow{opacity:0}
 /* ヘッダーの文字ロゴ：l の線が上から降り、字が1字ずつ浮かび、最後に線が右へ折れて単語の下を抜ける（型E：分割して連結）。
    字のずらしは JS が --i を振る（15字 × 0.024s ≈ 全体 0.36s） */
+/* シンボルが先に組み上がり（横棒が出る→線が降りる→右へ折れる）、続いて文字ロゴが同じ筋書きをなぞる */
+.brand .sy-bars,.brand .sy-spine,.brand .sy-elbow{transform-box:fill-box}
+.brand.intro .sy-bars{animation:lg-bars .5s var(--ease-snap) .05s both}
+.brand.intro .sy-spine{transform-origin:50% 0;animation:lg-spine .5s var(--ease-io) .15s both}
+.brand.intro .sy-elbow{transform-origin:0 50%;animation:lg-elbow .35s var(--ease-io) .6s both}
+@keyframes lg-bars{0%{opacity:0;transform:translateX(-12%)}20%{opacity:1}100%{opacity:1;transform:none}}
 .brand #wm-spine,.brand #wm-elbow,.brand .wm-ch{transform-box:fill-box}
-.brand.intro #wm-spine{transform-origin:50% 0;animation:lg-spine .6s var(--ease-io) .1s both}
-.brand.intro .wm-ch{animation:lg-ch .6s var(--ease-snap) calc(.35s + var(--i,0) * .024s) both}
-.brand.intro #wm-elbow{transform-origin:0 50%;animation:lg-elbow .55s var(--ease-io) .8s both}
+/* ホバーで線を流れる光。差し色を明るくした色で、線の上に重ねる。普段は透明 */
+.brand .flow{stroke:color-mix(in oklab,var(--terra) 30%,var(--ivory));stroke-dasharray:26 200;stroke-dashoffset:26;opacity:0;transition:opacity .2s ease}
+.brand #wm-flow{stroke-dasharray:10 200;stroke-dashoffset:10}
+.brand.intro #wm-spine{transform-origin:50% 0;animation:lg-spine .6s var(--ease-io) .45s both}
+.brand.intro .wm-ch{animation:lg-ch .6s var(--ease-snap) calc(.7s + var(--i,0) * .024s) both}
+.brand.intro #wm-elbow{transform-origin:0 50%;animation:lg-elbow .55s var(--ease-io) 1.15s both}
 @keyframes lg-ch{0%{opacity:0;transform:translateY(30%)}20%{opacity:1}100%{opacity:1;transform:none}}
 @keyframes lg-spine{from{transform:scaleY(0)}}
 @keyframes lg-elbow{from{transform:scaleX(0)}}
@@ -643,22 +656,30 @@ p{margin:0;text-wrap:pretty}
    マウスで指せる端末に限る（タッチでは :hover が押したあと残るため）。動きを減らす設定では付けない。
    浮かせる量は 2〜6px に抑える：図の線（委任グラフ・層の線）が要素の縁につながっていて、大きく動かすと離れて見える。 */
 @media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
-  /* 文字ロゴ：折れた線が少し先へ伸び、字がわずかに持ち上がる（線が字の下を通り抜けていく感じを足す）。
-     translateY は viewBox の単位（高さ 28px に 2535 単位）なので -60 で約 0.7px＝ごく小さく浮く */
-  .brand #wm-elbow{transition:transform .5s var(--ease-snap)}
-  .brand:hover #wm-elbow{transform:scaleX(1.05)}
-  .brand .wm-letters{transition:transform .5s var(--ease-snap)}
-  .brand:hover .wm-letters{transform:translateY(-60px)}
+  /* ロゴ：光が線を流れる。シンボルの線を上から下へ、折れて右へ抜けたあと、文字ロゴの l から入って単語の下を右端まで。
+     「依頼が層を通って委任先へ抜けていく」というシンボルの意味を、そのまま動きにした。2.2s 周期で、流れ終わったら少し間を置く。
+     光の長さは道筋の長さに対する % なので、長い文字ロゴ側は短めにして見た目の長さを揃える */
+  .brand:hover .flow{opacity:1}
+  .brand:hover .sy-flow{animation:flow-sy 2.2s linear infinite}
+  .brand:hover #wm-flow{animation:flow-wm 2.2s linear infinite}
+  @keyframes flow-sy{0%{stroke-dashoffset:26;animation-timing-function:cubic-bezier(.45,0,.55,1)}32%,100%{stroke-dashoffset:-100}}
+  @keyframes flow-wm{0%,24%{stroke-dashoffset:10;animation-timing-function:cubic-bezier(.3,0,.2,1)}78%,100%{stroke-dashoffset:-100}}
 
-  /* 案内役：少し身を乗り出し、吹き出しも追って揺れる */
-  .guide img{transform-origin:50% 100%;transition:transform .6s var(--ease-snap)}
-  .guide:hover img{transform:translateY(-6px) rotate(-1.5deg)}
-  .bubble{transition:transform .6s var(--ease-snap) .05s}
-  .guide:hover .bubble{transform:translateY(-3px) rotate(1deg)}
+  /* 案内役：指しているあいだ、ゆっくり呼吸する（胸が上下する程度・人の呼吸に合わせて 2.8s）。
+     傾けると「絵が板のまま傾いた」ように見えたので、支点を足元にした縦の伸び縮みだけにする */
+  .guide:hover img{transform-origin:50% 100%;animation:breathe-body 2.8s ease-in-out infinite}
+  @keyframes breathe-body{0%,100%{transform:none}50%{transform:translateY(-2px) scale(1.006,1.014)}}
+  /* 吹き出し：一度しぼんで、別のセリフに入れ替わって弾む（型A）。セリフの入れ替えはしぼみ切る 0.15s に合わせる */
+  .guide:hover .bubble{animation:bubble-swap .6s ease-in-out both}
+  @keyframes bubble-swap{0%{transform:none}25%{transform:scale(.9)}60%{transform:scale(1.05)}80%{transform:scale(.99)}100%{transform:none}}
+  .bubble .say-a,.bubble .say-b{transition:opacity .12s linear .15s}
+  .guide:hover .bubble .say-a{opacity:0}
+  .guide:hover .bubble .say-b{opacity:1}
 
-  /* ドット絵のモネ：うなずきを2回（小さな合図は2回）。1ドット＝--s 画素の格子で動かし、にじませない */
-  .sprite:hover img{animation:nod .5s steps(1,end) 2}
-  @keyframes nod{0%{transform:none}25%{transform:translateY(calc(var(--s) * 2px))}60%{transform:translateY(calc(var(--s) * 1px))}85%{transform:none}}
+  /* ドット絵のモネ：指しているあいだ、ぴょこぴょこ弾み続ける（ゲームの待機モーションのように1ドット刻み）。
+     上へ跳ねられるよう、.sprite に頭上の余白（--head ドット）を取ってある */
+  .sprite:hover img{animation:hop .72s steps(1,end) infinite}
+  @keyframes hop{0%{transform:none}20%{transform:translateY(calc(var(--s) * -2px))}40%{transform:translateY(calc(var(--s) * -3px))}60%{transform:translateY(calc(var(--s) * -2px))}80%{transform:translateY(calc(var(--s) * 1px))}}
 
   /* 層のボタン：右へ寄り、挿絵が少し回って大きくなる */
   .layer-btn{transition:border-color .2s ease,background-color .2s ease,transform .45s var(--ease-snap)}
@@ -710,6 +731,10 @@ p{margin:0;text-wrap:pretty}
 }
 /* 吹き出しのセリフは文節の切れ目でだけ折る（「説明でき／ていたら」と割れた） */
 .bubble .phr{word-break:keep-all;overflow-wrap:anywhere}
+/* ホバーで入れ替わる2つのセリフを同じ場所に重ねる（大きさは長いほうに合う＝入れ替えで吹き出しの形が変わらない） */
+.bubble .says{display:grid}
+.bubble .says > span{grid-area:1 / 1}
+.bubble .say-b{opacity:0}
 /* 図の見出しは文節の切れ目（wbr）でだけ折る（スマホで「実／際」「助っ／人AI」と割れた） */
 .fig-head h2{word-break:keep-all;overflow-wrap:anywhere}
 </style>
@@ -745,6 +770,7 @@ p{margin:0;text-wrap:pretty}
 <header class="site-head">
   <div class="wrap-wide bar">
     <a class="brand" href="#fig-a" aria-label="Claude System Map（ページの先頭へ）">
+      <svg class="brand-symbol" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><path class="sy-bars" fill="#4B413A" d="M13 14.55 L28.16 14.55 L28.16 27.39 L13 27.39 Z M48.16 14.55 L87 14.55 L87 27.39 L48.16 27.39 Z M13 38.88 L28.16 38.88 L28.16 51.72 L13 51.72 Z M48.16 38.88 L79 38.88 L79 51.72 L48.16 51.72 Z M13 63.21 L28.16 63.21 L28.16 76.05 L13 76.05 Z M48.16 63.21 L71 63.21 L71 76.05 L48.16 76.05 Z"/><path class="sy-spine" fill="#C25A3F" d="M34.66 3.39 L41.66 3.39 L41.66 94.21 L34.66 94.21 Z"/><path class="sy-elbow" fill="#C25A3F" d="M34.66 87.21 L71.26 87.21 L71.26 94.21 L34.66 94.21 Z"/><path class="flow sy-flow" fill="none" stroke-width="7.00" pathLength="100" d="M38.16 3.39V90.71H71.26"/></svg>
       <svg viewBox="0 0 18305.5 2536.1" aria-hidden="true" focusable="false">
 <!-- 字形: Inter Version 4.001;git-66647c0bb wght 600 opsz 32 / This Font Software is licensed under the SIL Open Font Licen -->
 <g class="wm-letters" fill="#4B413A">
@@ -754,6 +780,7 @@ p{margin:0;text-wrap:pretty}
 </g>
 <path id="wm-spine" class="wm-spine" fill="#C25A3F" d="M1656.1 126.0H1908.9V2187.6H1656.1Z"/>
 <path id="wm-elbow" class="wm-elbow" fill="#C25A3F" d="M1656.1 2187.6H18179.5V2410.1H1656.1Z"/>
+<path id="wm-flow" class="flow" fill="none" stroke-width="222.5" pathLength="100" d="M1782.5 126.0V2298.8H18179.5"/>
 </svg>
     </a>
     <nav class="site-nav" aria-label="図へのジャンプ">
@@ -780,7 +807,7 @@ p{margin:0;text-wrap:pretty}
         <p class="lead">個人で使っている Claude Code の構成図です。設定ファイルを置くだけでなく、会話をまたいで記憶を残し、区切りごとに記憶を整理し直し（この構成では「睡眠」と呼びます）、専門エージェントや外部モデルに仕事を振り分け、Claude Code 自身の設定を点検する仕組みを、7つの層に分けて組んでいます。層を選ぶと、その層の役割と実例が開きます。</p>
       </div>
       <div class="guide">
-        <p class="bubble"><span class="phr">わかりやすく<wbr>説明できていたら<wbr>嬉しいな</span><small>──《案内役》モネ</small></p>
+        <p class="bubble"><span class="says"><span class="phr say-a">わかりやすく<wbr>説明できていたら<wbr>嬉しいな</span><span class="phr say-b" aria-hidden="true">気になる層から<wbr>開いてみてね</span></span><small>──《案内役》モネ</small></p>
         <img src="assets/monet/cut/pose-guide.webp" width="330" height="275" alt="案内役のモネ。左の図を手で示している">
       </div>
     </div>
@@ -1528,6 +1555,12 @@ if(!REDUCE){
       rvIO.unobserve(en.target);
     });
   }, {threshold:.12, rootMargin:'0px 0px -8% 0px'});
+  // 入場が終わったら .rv / .in を外す。fill: both で最後の姿（transform: none）が残り続けると、
+  // ホバーで付ける transform がアニメーションに上書きされて効かなくなる
+  document.addEventListener('animationend', e => {
+    const el = e.target;
+    if(el.classList && el.classList.contains('in') && /^rv-/.test(e.animationName)){ el.classList.remove('rv', 'in'); el.style.removeProperty('--rv-d'); }
+  });
   RV_GROUPS.forEach(([sel, childSel, base]) => document.querySelectorAll(sel).forEach(host => {
     const items = [...host.querySelectorAll(childSel)];
     const step = items.length > 1 ? Math.min(.1, .36 / (items.length - 1)) : 0;
@@ -1547,6 +1580,8 @@ if(!REDUCE){
   const brand = document.querySelector('.brand');
   brand.querySelectorAll('.wm-ch').forEach((ch, i) => ch.style.setProperty('--i', i));
   brand.classList.add('intro');
+  // ロゴの入場（最後は文字ロゴの折れ 1.15s＋0.55s）が済んだら外す。同じ理由でホバーの動きを妨げないため
+  setTimeout(() => brand.classList.remove('intro'), 1900);
 }
 
 /* ======================= ヘッダーの現在地 ======================= */

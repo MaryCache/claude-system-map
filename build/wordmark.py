@@ -84,6 +84,12 @@ def main() -> None:
     spine = rect(stem_l, cap_top, stem_r, elbow_top)
     # 折れは縦線の左端から始めて角を四角く閉じる（縦線と重ねて継ぎ目を出さない）
     elbow = rect(stem_l, elbow_top, right, elbow_bottom)
+    # ホバーで光を走らせる道筋：l の縦画の中心を降り、折れの中心で右へ曲がって右端まで。
+    # 太さは細いほう（折れ）に合わせ、縦線・折れのどちらからもはみ出さないようにする
+    cx = round((stem_l + stem_r) / 2 - min_x, 1)
+    cy = round((elbow_top + elbow_bottom) / 2 - top, 1)
+    flow = f'M{cx} {round(cap_top - top, 1)}V{cy}H{round(right - min_x, 1)}'
+    flow_w = round(stem_w * ELBOW_THIN, 1)
     src = run.font
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" role="img" aria-label="Claude System Map">\n'
@@ -93,6 +99,7 @@ def main() -> None:
         + '</g>\n'
         f'<path id="wm-spine" class="wm-spine" fill="{TERRA}" d="{spine}"/>\n'
         f'<path id="wm-elbow" class="wm-elbow" fill="{TERRA}" d="{elbow}"/>\n'
+        f'<path id="wm-flow" class="flow" fill="none" stroke-width="{flow_w}" pathLength="100" d="{flow}"/>\n'
         '</svg>\n'
     )
     out = os.path.join(ROOT, 'assets', 'logo', 'system-map-wordmark.svg')
