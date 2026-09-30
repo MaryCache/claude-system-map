@@ -55,7 +55,11 @@ for slot,(keys,cut,alt) in SLOTS.items():
         bb=a.getbbox() or (0,0,w,h)
         rows=round(h*0.42)
         # SP 用の顔の窓：上から 34% の行、幅は不透明部分の中央 60%
-        cw=bb[2]-bb[0]; hw=max(24,round(cw*0.62)); hdx=bb[0]+round((cw-hw)/2); hrows=round(h*0.34)
+        # SP 用の顔の窓：上から 34% の行。幅は、その行の範囲に実際に描かれている部分（髪・リボンの房まで）に合わせる。
+        # 全身の幅の中央 62% で切ると、リボンの房と髪の端が見切れた（2026-09-30 スマホで確認）
+        hrows=round(h*0.34)
+        hb=a.crop((0,0,w,hrows)).getbbox() or bb
+        hdx=hb[0]; hw=max(24,hb[2]-hb[0])
         rel='assets/monet/pixel/'+os.path.basename(p)
         alt_txt = alt or 'モネ'
         html=(f'<div class="sprite" style="--w:{w};--h:{h};--rows:{rows};--hw:{hw};--hdx:{hdx};--hrows:{hrows}">'

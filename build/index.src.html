@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Claude System Map — 7層の Claude Code 構成図</title>
-<meta name="description" content="記憶を保持し、眠って整理し、専門エージェントや外部モデルに仕事を振り分け、自らを点検する。7層で動かしている個人の Claude Code 構成図です。">
+<meta name="description" content="記憶を保持し、定期的に整理し、専門エージェントや外部モデルに仕事を振り分け、自らを点検する仕組みを7層に分けて組んだ、個人の Claude Code 構成図です。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Claude System Map — 7層の Claude Code 構成図">
-<meta property="og:description" content="記憶・睡眠・委任・自己点検。7層で動かしている個人の Claude Code 構成図。">
+<meta property="og:description" content="記憶・睡眠・委任・自己点検を備えた、7層で動かしている個人の Claude Code 構成図です。">
 <meta property="og:url" content="https://marycache.github.io/claude-system-map/">
 <meta property="og:image" content="https://marycache.github.io/claude-system-map/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -194,9 +194,9 @@ p{margin:0;text-wrap:pretty}
 .layer-btn[aria-pressed="true"] .no,.layer-btn[aria-pressed="true"] .rl,.layer-btn[aria-pressed="true"] .chev{color:var(--grey)}
 .layer-btn[aria-pressed="true"] .tag{color:var(--ivory);border-color:var(--terra-on-dark)}
 .layer-btn[aria-pressed="true"] .chev{transform:rotate(-90deg)}
-.layer-btn.core{border-left:4px solid var(--terra);padding-left:9px}
+/* 中核の層は「中核」のタグと、ゆっくり脈打つ枠で示す（角丸カードに左ボーダーは付けない） */
 .layer-btn.core:not([aria-pressed="true"]){animation:pulse 4s ease-in-out infinite}
-@keyframes pulse{50%{border-color:color-mix(in oklab,var(--terra) 55%,var(--grey));border-left-color:var(--terra)}}
+@keyframes pulse{50%{border-color:color-mix(in oklab,var(--terra) 55%,var(--grey))}}
 .stack-caption{margin-top:16px;padding-left:40px;font-size:14px;color:var(--ink-dim);max-width:40em}
 
 .detail-host{
@@ -230,7 +230,7 @@ p{margin:0;text-wrap:pretty}
 .sample-head .fn{font-family:var(--font-mono);font-size:13px;color:var(--ink-dim)}
 .sample pre{
   margin:0;padding:16px 18px;overflow-x:auto;overscroll-behavior-x:contain;tab-size:2;
-  background:var(--ink);color:var(--ivory);border-radius:var(--radius-node);border-left:3px solid var(--terra);
+  background:var(--ink);color:var(--ivory);border-radius:var(--radius-node);
   font-family:var(--font-mono);font-size:13px;line-height:1.7;
 }
 .sample pre .k{color:var(--terra-on-dark)}
@@ -396,10 +396,10 @@ p{margin:0;text-wrap:pretty}
 .cell:hover{filter:brightness(.98)}
 .cell[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ivory),0 0 0 4px currentColor}
 .cell span{color:var(--ink)}
-.cell-out{margin-top:16px;border-left:3px solid var(--line-strong);padding:4px 0 4px 18px;min-height:3em}
+.cell-out{margin-top:16px;padding:12px 16px;min-height:3em;background:color-mix(in oklab,var(--line-strong) 14%,transparent)}
 .cell-out h4{font-size:16px;display:flex;align-items:center;gap:8px}
 .cell-out.go h4{color:var(--go)} .cell-out.ask h4{color:var(--ask-ink)} .cell-out.stop h4{color:var(--stop)}
-.cell-out.go{border-color:var(--go)} .cell-out.ask{border-color:var(--ask-ink)} .cell-out.stop{border-color:var(--stop)}
+.cell-out.go{background:color-mix(in oklab,var(--go) 9%,transparent)} .cell-out.ask{background:color-mix(in oklab,var(--ask-ink) 9%,transparent)} .cell-out.stop{background:color-mix(in oklab,var(--stop) 9%,transparent)}
 .cell-out p{margin-top:4px;font-size:15px}
 .cell-out ul{margin:8px 0 0;padding-left:1.2em;font-size:15px;columns:2;column-gap:32px}
 .cell-out .hint{color:var(--ink-dim);font-size:15px}
@@ -589,7 +589,8 @@ p{margin:0;text-wrap:pretty}
   .kv li{grid-template-columns:1fr;gap:0}
   .libs{grid-template-columns:1fr}
   .lib,.lib + .lib{padding:16px 0;border-left:0;border-bottom:1px solid var(--line)}
-  .foot-grid{grid-template-columns:auto 1fr}
+  /* スマホでは縦に積む（横並びだと本文の列が数文字幅になった・2026-09-30） */
+  .foot-grid{grid-template-columns:1fr;gap:16px}
   .foot-links{grid-column:1 / -1;align-items:flex-start}
 }
 @media (min-width:861px){ .sheet{display:none} }
@@ -661,7 +662,7 @@ p{margin:0;text-wrap:pretty}
       <div>
         <p class="fig-no">図A　7つの層</p>
         <h1 id="fig-a-title">Claude Code を、7つの層で動かす</h1>
-        <p class="lead">単なる設定ファイルの集合ではなく、記憶を保持し、眠って整理し、専門エージェントや外部モデルに仕事を振り分け、自らを点検する「7層のAIエージェント組織」として動かしている、個人の Claude Code 構成図です。層を選ぶと、その層の役割と実例が開きます。</p>
+        <p class="lead">個人で使っている Claude Code の構成図です。設定ファイルを置くだけでなく、会話をまたいで記憶を残し、区切りごとに記憶を整理し直し（この構成では「睡眠」と呼びます）、専門エージェントや外部モデルに仕事を振り分け、自分の設定を点検する仕組みを、7つの層に分けて組んでいます。層を選ぶと、その層の役割と実例が開きます。</p>
       </div>
       <div class="guide">
         <p class="bubble">わかりやすく、一緒に見ていきましょう。<small>案内役のモネです</small></p>
@@ -683,14 +684,14 @@ p{margin:0;text-wrap:pretty}
             <li><button class="layer-btn" type="button" data-layer="7" aria-pressed="false" aria-controls="layer-7"><span class="no">07</span><span><span class="nm">判断のルール</span><span class="rl">緑（実行可）／黄（要確認）／赤（禁止）</span></span>{{ILLUST_NODE_7}}<svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
           </ol>
         </div>
-        <p class="stack-caption">会話のたびに、この7つの層が連携して動きます。上から、土台 → 記憶 → 自動制御 → 実行 → 外部モデル → 運用 → 判断の順に積み上がり、上の層ほど土台と記憶を、下の層ほど実行と判断を担います。一般的な設定と最も違うのは、3番目の層（中核）です。</p>
+        <p class="stack-caption">会話のたびに、この7つの層が連携して動きます。層は上から、土台 → 記憶 → 自動制御 → 実行 → 外部モデル → 運用 → 判断の順に並べています。一般的な設定と最も違うのは、3番目の層（中核）です。</p>
       </div>
 
       <div class="detail-host" id="detail-host" aria-live="polite">
 
         <article class="layer-detail" id="layer-1" aria-labelledby="layer-1-h">
           <div class="ld-head">{{ILLUST_DETAIL_1}}<div><div class="ld-no">層 01</div><h3 id="layer-1-h">静的設定</h3><div class="ten">毎回読む土台・ルール</div></div></div>
-          <p>会話のたびに必ず読み込む土台です。実行可能な操作・委任の方針・モデルの使い分けをルールとして定義します。重い一覧は常時読み込まず、必要なときだけ読む方式にして文脈の圧迫を避けています。</p>
+          <p>会話のたびに必ず読み込む土台です。実行してよい操作・委任の方針・モデルの使い分けをルールとして定義します。重い一覧は常時読み込まず、必要なときだけ読みます。</p>
           <ul class="chips"><li>CLAUDE.md（目次）</li><li class="key">AUTHORITY（判断基準）</li><li>委任ルール</li><li>モデル選択ルール</li><li>外部ワーカーの境界</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">CLAUDE.md</span></div>
@@ -699,14 +700,14 @@ p{margin:0;text-wrap:pretty}
 <span class="k">@</span>~/.claude/rules/subagent-delegation.md
 <span class="k">@</span>~/.claude/rules/model-routing.md
 <span class="c"># 待機101体のカタログは重いため @import せず、必要時に Read（オンデマンド）</span></code></pre>
-            <p class="why"><b>なぜ</b>：起動時に必ず読む土台。重い一覧を常時読み込むと文脈が圧迫され参照精度が落ちるため、必要時のみ読み込みます。</p>
+            <p class="why"><b>なぜ</b>：毎回読むものは、そのぶんコンテキストを消費します。重い一覧まで常時読み込むとコンテキストが圧迫されて参照の精度が落ちるため、必要なときだけ読み込みます。</p>
           </div>
           <a class="more" href="#fig-e"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図E フォルダ構成で、実際の置き場所を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-2" aria-labelledby="layer-2-h">
           <div class="ld-head">{{ILLUST_DETAIL_2}}<div><div class="ld-no">層 02</div><h3 id="layer-2-h">記憶</h3><div class="ten">会話をまたいで覚える</div></div></div>
-          <p>会話が終了しても保持される記憶です。「利用者の好み」「作業方針」「進行中の案件」「外部リソース」の4種類に分け、コードからは読み取れない事実と判断の理由を100ファイルと索引で蓄積します。</p>
+          <p>会話が終了しても保持される記憶です。「利用者の好み」「作業方針」「進行中の案件」「外部リソース」の4種類に分け、コードからは読み取れない事実と判断の理由を、100個のファイルと索引に蓄積します。</p>
           <div class="ratio" data-reveal>
             <div class="ratio-track" role="img" aria-label="記憶ファイル100の内訳：作業方針46、外部リソース37、案件14、利用者3">
               <span class="ratio-seg s1" style="flex:46">作業方針 46</span><span class="ratio-seg s2" style="flex:37">外部リソース 37</span><span class="ratio-seg s3" style="flex:14">案件 14</span><span class="ratio-seg s4" style="flex:3"></span>
@@ -724,14 +725,14 @@ p{margin:0;text-wrap:pretty}
 <span class="c">---</span>
 新規UIは creator → library補強 → frontend-design の順で回す。
 <span class="k">**Why**</span>：役割分離が崩れると一貫性と再利用性が失われる。</code></pre>
-            <p class="why"><b>なぜ</b>：会話をまたいで残す事実。種類で分類し、判断の理由（Why）まで記録して次回以降に再利用します。</p>
+            <p class="why"><b>なぜ</b>：会話をまたいで残したい事実を種類ごとに分けて記録します。判断の理由（Why）も一緒に残し、次回以降の判断に使います。</p>
           </div>
         </article>
 
         <article class="layer-detail" id="layer-3" aria-labelledby="layer-3-h">
           <div class="ld-head">{{ILLUST_DETAIL_3}}<div><div class="ld-no">層 03・中核</div><h3 id="layer-3-h">自動で動くしくみ</h3><div class="ten">注入・安全装置・睡眠</div></div></div>
-          <p>本システムが一般的な設定と最も異なる中核部です。6種類のタイミングで計8本のフック（自動実行される小さなプログラム）が動きます。開始時に人格と看板を注入し、危険な操作は判断に頼らずコードで止め、コンテキスト圧縮の直前には「睡眠」で記憶を整理します。</p>
-          <ul class="chips"><li class="key">開始時の注入</li><li class="key">危険操作の機械的ブロック</li><li class="key">睡眠（sleep）</li><li>文脈の残量リマインド</li><li>委任モデルの実測ログ</li></ul>
+          <p>本システムが一般的な設定と最も異なる中核部です。6種類のタイミングで計8本のフック（自動実行される小さなプログラム）が動きます。開始時に人格と看板（作業の状態を並べたタスクボード）を注入し、危険な操作はモデルの判断に頼らずコードで止め、コンテキスト圧縮の直前には「睡眠」（溜まった情報を記憶と看板へ書き出す手順）で記憶を整理します。</p>
+          <ul class="chips"><li class="key">開始時の注入</li><li class="key">危険操作の機械的ブロック</li><li class="key">睡眠（sleep）</li><li>コンテキスト残量のリマインド</li><li>委任モデルの実測ログ</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例（フック）</h4><span class="fn">settings.json</span></div>
 <pre><code><span class="k">"hooks"</span>: {
@@ -744,14 +745,14 @@ p{margin:0;text-wrap:pretty}
   <span class="k">"PreCompact"</span>:   [{ "command": <span class="v">"~/.claude/hooks/pre-compact-sleep.sh"</span> }]
                                <span class="c">// 圧縮の直前に「睡眠」を促す</span>
 }</code></pre>
-            <p class="why"><b>なぜ</b>：これらはモデルの判断に依存せず、指定タイミングで<b>必ず実行されます</b>（決定論的）。確実性が要る処理を、確率的な自然言語の指示と分けてここに置いています。</p>
+            <p class="why"><b>なぜ</b>：これらはモデルの判断に依存せず、指定タイミングで<b>必ず実行されます</b>（決定論的）。確実に実行したい処理は、守られるかどうかがモデル次第になる自然言語の指示には書かず、ここに置いています。</p>
           </div>
           <a class="more" href="#fig-b"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図B 会話の流れで、フックが働く順番を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-4" aria-labelledby="layer-4-h">
           <div class="ld-head">{{ILLUST_DETAIL_4}}<div><div class="ld-no">層 04</div><h3 id="layer-4-h">実行</h3><div class="ten">作業を担う</div></div></div>
-          <p>実際の作業を担う層です。定型手順をこなす「スキル」が72個、得意分野ごとの「助っ人AI」が起動可能62体（待機101体）。委任先は「基本の14体は常に緑、現在主に使う技術に一致する専門AIも緑、それ以外は黄」で決まります。動画（Remotion 12スキル）・小説・TRPGログ・デザイン生成のスキルも含みます。</p>
+          <p>実際の作業を担う層です。定型の手順を定めた「スキル」が72個、得意分野ごとの「助っ人AI」（サブエージェント）が起動可能な62体と待機中の101体あります。基本の14体と、いま主に使う技術に一致する専門AIは確認なしで起動し（緑）、それ以外は起動前に確認します（黄）。スキルには動画（Remotion 12スキル）・小説・TRPGログ・デザイン生成も含みます。</p>
           <ul class="chips"><li>スキル 72</li><li>助っ人AI 62</li><li>待機 101</li><li>役割の4階層</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例（サブエージェント委任）</h4><span class="fn">Agent()</span></div>
@@ -759,7 +760,7 @@ p{margin:0;text-wrap:pretty}
 Agent(<span class="k">code-reviewer</span>)      ← "認証まわりの差分をレビュー"
 Agent(<span class="k">architect-reviewer</span>) ← "層構成の妥当性を確認"
 <span class="c">// 各自の文脈で実行し、結論の要約だけが本会話へ戻る</span></code></pre>
-            <p class="why"><b>なぜ</b>：62体（待機101体）から専門家を選んで委任します。中間処理は隔離されるため、大量の調査をしても本会話の文脈を占有しません。</p>
+            <p class="why"><b>なぜ</b>：中間の処理はサブエージェント側のコンテキストで行われるため、大量の調査を任せても本会話のコンテキストを圧迫しません。</p>
           </div>
           <a class="more" href="#fig-c"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図C 委任で、誰に振るかを見る</a>
           <a class="more" href="#lists" style="margin-left:16px"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>スキルと助っ人AIの一覧</a>
@@ -767,7 +768,7 @@ Agent(<span class="k">architect-reviewer</span>) ← "層構成の妥当性を�
 
         <article class="layer-detail" id="layer-5" aria-labelledby="layer-5-h">
           <div class="ld-head">{{ILLUST_DETAIL_5}}<div><div class="ld-no">層 05・新層</div><h3 id="layer-5-h">外部モデルワーカー</h3><div class="ten">別のモデルへ仕事を振る</div></div></div>
-          <p>Claude 以外のモデルを「ワーカー」として呼ぶ層です。Codex は実装（GPT-5.6 Luna）と画像生成（GPT Image 2.5）の2本柱、読み取り調査はローカルの Qwen3.8 27B、文章生成と急ぎの調査は Gemini、段階的な分析は GLM など。ローカルか外部か、速いか遅いかで使い分け、機密はローカルだけに限ります。</p>
+          <p>Claude 以外のモデルを「ワーカー」として呼ぶ層です。Codex には実装（GPT-5.6 Luna）と画像生成（GPT Image 2.5）を、読み取り調査にはローカルの Qwen3.8 27B を、文章生成と急ぎの調査には Gemini を、段階的な分析には GLM などを割り当てています。ローカルか外部か、速いか遅いかで使い分け、機密を含む調査はローカルに限ります。</p>
           <ul class="chips"><li class="key">ワーカー 7</li><li>ローカル 1</li><li>外部 6</li><li class="key">Codex＝実装＋画像生成</li><li>停止中 1本を除く</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">Agent() → 別モデル</span></div>
@@ -775,36 +776,36 @@ Agent(<span class="k">architect-reviewer</span>) ← "層構成の妥当性を�
 Agent(<span class="k">gemini-probe-worker</span>)   ← "この設計の該当箇所を急ぎで調査"       <span class="c">// 外部・数十秒</span>
 Agent(<span class="k">luna-codex-worker</span>)     ← "このバグを直してテストを更新"         <span class="c">// 外部・区切られた実装</span>
 Agent(<span class="k">codex-image-worker</span>)    ← "透過背景のUIアイコンを1枚"           <span class="c">// 外部・GPT Image 2.5</span></code></pre>
-            <p class="why"><b>なぜ</b>：中量級の作業を別モデルへ逃がして本流の判断を軽く保ちます。<b>結果は「証拠」であって正しさの証明ではない</b>ため、どのモデルが実処理したかを報告に含め、確認していない検査を済んだことにしません。</p>
+            <p class="why"><b>なぜ</b>：中量級の作業を別モデルに任せ、本流（最終判断を担うメインの Claude）の負荷を抑えます。<b>結果は「証拠」であって正しさの証明ではない</b>ため、どのモデルが実処理したかを報告に含め、確認していない検査を済んだことにしません。</p>
           </div>
           <a class="more" href="#fig-c"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図C 委任で、7本のワーカーを見る</a>
         </article>
 
         <article class="layer-detail" id="layer-6" aria-labelledby="layer-6-h">
           <div class="ld-head">{{ILLUST_DETAIL_6}}<div><div class="ld-no">層 06</div><h3 id="layer-6-h">運用・自己点検</h3><div class="ten">健全性を保つ</div></div></div>
-          <p>「AIの仕組みは警告なく静かに壊れる」という課題への対策層です。作業を看板で可視化し、成果物は2名体制でレビュー（重要な判断は全員一致まで）、月次で不要物を整理し、設定の健康診断・常時ロード量の測定・睡眠による記憶の蒸留を回します。</p>
-          <ul class="chips"><li>看板ボード</li><li>2名レビュー</li><li>健康診断</li><li>月次整理</li><li>睡眠</li><li class="key">決裁の監査</li></ul>
+          <p>「AIの仕組みは警告なく静かに壊れる」という課題への対策層です。作業を看板（タスクボード）で可視化し、成果物は2名体制でレビュー（重要な判断は全員一致まで）、月次で不要物を整理し、設定の健康診断・常時ロード量の測定・睡眠による記憶の書き出しを定期的に行います。</p>
+          <ul class="chips"><li>看板ボード</li><li>2名レビュー</li><li>健康診断</li><li>月次整理</li><li>睡眠</li><li class="key">判断ルールの監査</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">ops/board.md</span></div>
 <pre><code><span class="k">- [ ] [alert]</span> refs: CLAUDE.md スキル索引に design-creator 未記載
   重大度: <span class="v">WARN</span>
   冪等キー: refs:CLAUDE.md-skills-index:8f3ffa6a
   推奨対応: ## スキル に2行追記</code></pre>
-            <p class="why"><b>なぜ</b>：健康診断が見つけた不整合を看板へ自動登録します。<b>実際にこの仕組みが、索引漏れを検出しました。</b></p>
+            <p class="why"><b>なぜ</b>：健康診断が見つけた不整合を看板へ自動登録します。上の例は、実際にこの仕組みが検出した索引漏れです。</p>
           </div>
-          <a class="more" href="#fig-d-audit"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図D で、決裁ルールの監査（Jev）を見る</a>
+          <a class="more" href="#fig-d-audit"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図D で、判断のルールの監査（Jev）を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-7" aria-labelledby="layer-7-h">
           <div class="ld-head">{{ILLUST_DETAIL_7}}<div><div class="ld-no">層 07</div><h3 id="layer-7-h">判断のルール</h3><div class="ten">自律の範囲を定める</div></div></div>
-          <p>全層を貫く責任の線引きです。AIが自ら決定してよい操作・人間に確認すべき操作・絶対に行わない操作を、信号機の色（緑／黄／赤）で区分します。赤は「常に最優先で評価」され、フックがコードでも止めます。</p>
+          <p>全層に共通する責任の線引きです。AIが自ら決定してよい操作・人間に確認すべき操作・絶対に行わない操作を、信号機の色（緑／黄／赤）で区分します。「常に赤」とした操作は最初に判定し、フックがコードでも止めます。</p>
           <ul class="chips"><li class="go">緑 実行可</li><li class="ask">黄 要確認</li><li class="stop">赤 禁止</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">AUTHORITY.md</span></div>
 <pre><code>git status / log / diff                  <span class="c">→</span> <span class="k">緑</span>（無確認）
 git commit / push（通常のブランチ）       <span class="c">→</span> <span class="k">黄</span>（確認）
 push --force to main ／ public への push <span class="c">→</span> <span class="k">赤</span>（禁止）</code></pre>
-            <p class="why"><b>なぜ</b>：可逆性×影響範囲で判定します。不可逆・高影響な操作は、確率的な指示遵守に委ねず人間の確認を必須にします。「常に赤」は最優先で評価されます。</p>
+            <p class="why"><b>なぜ</b>：色は、やり直せるか（可逆性）と影響が自分の作業範囲を超えるか（影響範囲）で決めます。やり直せない操作や影響の広い操作は、モデルが指示を守ることに期待せず、人間の確認を必須にするか実行しません。</p>
           </div>
           <a class="more" href="#fig-d"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図D 判断のルールを見る</a>
         </article>
@@ -825,7 +826,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
     <div class="does">
       <div><h3><svg class="icon" aria-hidden="true"><use href="#i-database"/></svg>覚えている</h3><p>過去の会話の事実や決定事項をファイルに残し、次回も参照します。</p></div>
-      <div><h3><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg>眠って整理する</h3><p>会話の終わりや圧縮の直前に、蓄積した情報を記憶と看板へ蒸留します。</p></div>
+      <div><h3><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg>眠って整理する</h3><p>会話の終わりやコンテキスト圧縮の直前に、溜まった情報の要点を記憶と看板へ書き出します。</p></div>
       <div><h3><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>専門家と外部モデルに振る</h3><p>得意分野ごとの専門AIに加え、速さ・場所（ローカル／外部）の異なるモデルへ仕事を振り分けます。</p></div>
       <div><h3><svg class="icon" aria-hidden="true"><use href="#i-clipboard-check"/></svg>自らを点検する</h3><p>設定の不整合を定期的に検査し、危険な操作はコードで止め、人間の確認が必要な操作では停止して問い合わせます。</p></div>
     </div>
@@ -838,7 +839,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="fig-head">
       <p class="fig-no">図B</p>
       <h2 id="fig-b-title">1回の会話で起きること</h2>
-      <p class="lead">会話の各場面で、自動スイッチ（フック）が順に働きます。左から右へ、はじまり → 準備 → 実行 → 睡眠。各場面の下に、そこで発火するフックを吊るしています。</p>
+      <p class="lead">会話の場面ごとに、決まったフックが自動で実行されます。場面は左から右へ、はじまり → 準備 → 実行 → 睡眠の順に並び、各場面の下にそこで実行されるフックの名前を示しています。</p>
 {{MONET fig-b}}
     </div>
 
@@ -846,25 +847,25 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
       <li class="scene">
         <span class="when">会話を開く</span>
         <h3><svg class="icon" aria-hidden="true"><use href="#i-message-square"/></svg>はじまり</h3>
-        <p>人格と看板の現状を自動で注入し、点検のリマインドを渡します。</p>
+        <p>人格と看板の現状を自動で注入し、点検を促すリマインドも添えます。</p>
         <ul class="hooks"><li>session-start.py</li></ul>
       </li>
       <li class="scene">
         <span class="when">入力時</span>
         <h3><svg class="icon" aria-hidden="true"><use href="#i-gauge"/></svg>準備</h3>
-        <p>文脈の残量を見張り、人格の維持を促します。</p>
+        <p>コンテキストの残量を監視し、人格を保つよう促します。</p>
         <ul class="hooks"><li>context-pressure.py</li><li>persona-reminder.py</li></ul>
       </li>
       <li class="scene">
         <span class="when">作業</span>
         <h3><svg class="icon" aria-hidden="true"><use href="#i-zap"/></svg>実行</h3>
-        <p>危険な操作はコードでブロック。委任先とモデルを記録します。</p>
+        <p>危険な操作をコードでブロックし、委任先とモデルを記録します。</p>
         <ul class="hooks"><li>pre-tool-guard.py</li><li>log-agent-model.py</li></ul>
       </li>
       <li class="scene sleep">
         <span class="when">圧縮の直前・就寝時</span>
         <h3><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg>睡眠</h3>
-        <p>蓄積した要点を記憶と看板へ蒸留し、設定をスナップショットします。</p>
+        <p>溜まった情報の要点を記憶と看板へ書き出し、設定のスナップショットを取ります。</p>
         <ul class="hooks"><li>pre-compact-sleep.sh</li></ul>
         <details>
           <summary><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg>睡眠の6手順を見る</summary>
@@ -879,18 +880,18 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         </details>
       </li>
     </ol>
-    <p class="note">睡眠は、論文「Language Models Need Sleep」の運用近似です。手動の <span class="mono">/sleep</span> と、コンテキスト圧縮の直前に走るフック（直近の実行から5分以内なら静かに終了）の2つの入口から、同じ6手順を踏みます。フックは6種類のタイミングで計8本あり、上はその主なものです。</p>
+    <p class="note">睡眠は、論文「Language Models Need Sleep」の考え方を運用の手順で近似したものです。手動の <span class="mono">/sleep</span> と、コンテキスト圧縮の直前に実行されるフック（直近の実行から5分以内なら何もせずに終了）の2つの入口から、同じ6手順を踏みます。フックは6種類のタイミングで計8本あり、上の図はそのうち主なものです。</p>
 
     <div class="sub-block">
       <h3>モデルの使い分け（重さは難度で決める）</h3>
-      <p class="note">サブエージェントの既定モデルは、各定義ファイルの宣言（frontmatter）が唯一の既定です。呼び出し側で上書きするのは「不可逆・共有物の設計判断」「事実の正確さが致命的」「判断軸が言語化できていない」の3条件のときだけで、下げるのは自由。件数が多いことは昇格の理由になりません。下のバーは、起動可能な62体の割り当てです。</p>
+      <p class="note">サブエージェントのモデルは、各定義ファイルの宣言（frontmatter）で決まり、これが唯一の既定です。呼び出し側で重いモデルに上げるのは「不可逆・共有物の設計判断」「事実の正確さが致命的」「判断軸が言語化できていない」の3条件のときだけで、軽いモデルに下げるのは自由です。処理する件数が多いことは、上げる理由になりません。下のバーは、起動可能な62体の割り当てです。</p>
       <div class="ratio" data-reveal>
         <div class="ratio-track" role="img" aria-label="起動可能な62体の既定モデル：sonnet 38体、haiku 14体、opus 6体、GPT-5.6 系 4体">
           <span class="ratio-seg s1" style="flex:38">sonnet 38</span><span class="ratio-seg s2" style="flex:14">haiku 14</span><span class="ratio-seg s3" style="flex:6">opus 6</span><span class="ratio-seg s4" style="flex:4"></span>
         </div>
         <ul class="ratio-legend">
           <li><i style="background:var(--ink)"></i>sonnet <b>38</b>体 — 実装・レビュー・テスト</li>
-          <li><i style="background:var(--terra-deep)"></i>haiku <b>14</b>体 — 探索・転送役（ワーカーの殻）</li>
+          <li><i style="background:var(--terra-deep)"></i>haiku <b>14</b>体 — 探索・中継役（ワーカーの呼び出しを中継する）</li>
           <li><i style="background:var(--grey)"></i>opus <b>6</b>体</li>
           <li><i style="background:var(--surface-2)"></i>GPT-5.6 系 <b>4</b>体</li>
         </ul>
@@ -905,16 +906,16 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="fig-head">
       <p class="fig-no">図C</p>
       <h2 id="fig-c-title">誰に仕事を振るか</h2>
-      <p class="lead">真ん中が本流（最終判断）。左は Claude のサブエージェント、右は別のモデルに「区切られた仕事」を1本ずつ委ねる外部モデルワーカーです。ワーカーが在るという理由では委任せず、Haiku では弱いが本流を回すほどでもない中量級だけを対象にします。呼び出し側の殻は軽量モデルで、実処理は各ワーカーのモデルが担います。</p>
+      <p class="lead">真ん中の本流（メインの Claude）が最終判断を担います。左は Claude のサブエージェント、右は別のモデルに範囲を区切った仕事を1本ずつ任せる外部モデルワーカーです。ワーカーがあるという理由だけでは任せず、Haiku では力不足だが本流で処理するほどでもない中量級の仕事に限ります。ワーカーの呼び出しは軽量モデルのサブエージェントが中継し、実際の処理は各ワーカーのモデルが行います。</p>
 {{MONET fig-c}}
     </div>
 
-    <p class="picker-label"><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>どこへ振るか（早見）— 課題の型を選ぶと、行き先まで線が走ります</p>
+    <p class="picker-label"><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>どこへ振るか（早見）— 課題の型を選ぶと、行き先まで線が引かれます</p>
     <div class="picker" role="group" aria-label="課題の型">
       <button class="pick" type="button" aria-pressed="false" data-to="qwen-local-worker" data-alt="quasar-worker" data-say="まず <b>qwen-local-worker</b>（ローカル）。塞がっていれば <b>quasar-worker</b>（破線）。">待てる読み取り調査</button>
       <button class="pick" type="button" aria-pressed="false" data-to="gemini-probe-worker" data-say="<b>gemini-probe-worker</b>（数十秒。外部・パスは渡す側が指定）">急ぐ読み取り調査</button>
       <button class="pick" type="button" aria-pressed="false" data-to="glm-worker" data-say="<b>glm-worker</b>（推論型・待てるとき）">段階的な分析・原因追跡</button>
-      <button class="pick" type="button" aria-pressed="false" data-to="gemini-worker" data-say="<b>gemini-worker</b>（最速。文脈は依頼文に埋める）">文章を書く</button>
+      <button class="pick" type="button" aria-pressed="false" data-to="gemini-worker" data-say="<b>gemini-worker</b>（最速。必要な情報は依頼文に書き込む）">文章を書く</button>
       <button class="pick" type="button" aria-pressed="false" data-to="luna-codex-worker" data-say="<b>luna-codex-worker</b>（GPT-5.6 Luna）">区切られた実装・修正</button>
       <button class="pick" type="button" aria-pressed="false" data-to="codex-image-worker" data-say="<b>codex-image-worker</b>（GPT Image 2.5・ローカル GPU 不使用）">画像を1枚作る</button>
     </div>
@@ -1010,7 +1011,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
     <h3 class="bounds-title">守っている境界</h3>
     <ul class="bounds">
-      <li><b>1本ずつは緑</b><span>同時に2本以上を走らせるときは黄（確認）</span></li>
+      <li><b>1本ずつは緑</b><span>同時に2本以上を実行するときは黄（確認）</span></li>
       <li><b>外部へ出るものを絞る</b><span>認証情報・鍵・個人データは依頼文に載せない（赤）。機密の調査はローカルのみ</span></li>
       <li><b>結果は証拠</b><span>実処理したモデルを報告に含め、報告されていない検査を済んだことにしない</span></li>
       <li><b>最終判断は本流</b><span>曖昧な要件・安全に関わる作業・破壊的な判断はワーカーに渡さない</span></li>
@@ -1024,7 +1025,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="fig-head">
       <p class="fig-no">図D</p>
       <h2 id="fig-d-title">判断のルール — 自律の範囲</h2>
-      <p class="lead">AIの暴走を防ぐための線引きです。信号機の色で「自ら決定してよい／確認のうえ実行／絶対に行わない」を区分します。上から順に読みます：まず「常に赤」、次に可逆性×影響範囲の表。判断に迷う場合は、必ず黄（確認）に倒します。</p>
+      <p class="lead">AIが自分で決めてよい範囲の線引きです。信号機の色で「自ら決定してよい／確認のうえ実行／絶対に行わない」を区分します。判定は上から順に進み、まず「常に赤」に当たるかを見て、当たらなければ可逆性×影響範囲の表で決めます。どれに当たるか迷う操作は黄（確認）として扱います。</p>
 {{MONET fig-d}}
     </div>
 
@@ -1062,10 +1063,10 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
     <div class="sub-block" id="fig-d-audit">
       <h3>ルール自体を監査する（Jev）</h3>
-      <p class="note">書いたルールが曖昧でないかを、TypeSafe の Jev（System One）に判定させて確かめています。ルールを渡して操作ごとに緑・黄・赤を選ばせ、自分の解釈と突き合わせます。実行時の判断経路には入れず、監査だけに使います。</p>
+      <p class="note">書いたルールが曖昧でないかを、TypeSafe の Jev（System One）に判定させて確かめています。ルールを渡して操作ごとに緑・黄・赤を選ばせ、自分の解釈と突き合わせます。作業中の判断には使わず、監査だけに使います。</p>
       <ol class="audit">
         <li><span class="step">段階1</span><h4>読解の確認</h4><p>表で答えが決まる22問を先に解かせる。ここで読み違えないことを確かめてから次へ進む。</p><div class="big"><div><b>22/22</b><small>正解</small></div></div></li>
-        <li><span class="step">段階2</span><h4>曖昧さの発見</h4><p>境界のケースを解かせ、ズレと確信度の低い問いを「ルールの穴」の候補にする。</p></li>
+        <li><span class="step">段階2</span><h4>曖昧さの発見</h4><p>境界のケースを解かせ、自分の解釈とズレた問いと確信度の低い問いを「ルールの穴」の候補にする。</p></li>
         <li class="result"><span class="step">結果</span><h4>ルールに9項目を追加</h4><p>例：public への push を赤に。</p><div class="big"><div><b>4→0</b><small>ズレ</small></div><div><b>0.21→0.59</b><small>最低確信度</small></div><div><b>9</b><small>追加した項目</small></div></div></li>
       </ol>
     </div>
@@ -1094,7 +1095,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
           <ul>
             <li><div class="row"><span class="nm">AUTHORITY.md</span><span class="a">判断のルール（緑/黄/赤）</span><button class="lyr" type="button" data-goto="7">層⑦</button></div></li>
             <li><div class="row"><span class="nm">subagent-delegation.md</span><span class="a">委任ルール・現役スタック・Tier</span></div></li>
-            <li><div class="row"><span class="nm">model-routing.md</span><span class="a">どのモデルで走らせるかの判断軸</span></div></li>
+            <li><div class="row"><span class="nm">model-routing.md</span><span class="a">どのモデルを使うかの判断軸</span></div></li>
             <li><div class="row"><span class="nm">external-model-routing.md</span><span class="a">外部ワーカーの使い分けと境界</span><button class="lyr" type="button" data-goto="5">層⑤</button></div></li>
           </ul></details></li>
         <li class="group-gap"><details open data-sp-close><summary><div class="row"><span class="nm dir">context/</span><span class="a">応答の文脈・人格</span><button class="lyr" type="button" data-goto="1">層①</button></div></summary>
@@ -1108,8 +1109,8 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         <li class="group-gap"><details open data-sp-close><summary><div class="row"><span class="nm dir">hooks/ ・ scripts/</span><span class="a">フックと、その本体（Python / シェル）</span><button class="lyr" type="button" data-goto="3">層③</button></div></summary>
           <ul>
             <li><div class="row"><span class="nm">session-start.py</span><span class="a">開始時に人格と看板を注入</span></div></li>
-            <li><div class="row"><span class="nm">pre-tool-guard.py</span><span class="a">「常に赤」を物理的にブロック（テスト付き）</span></div></li>
-            <li><div class="row"><span class="nm">context-pressure.py / persona-reminder.py</span><span class="a">文脈の残量・人格のリマインド</span></div></li>
+            <li><div class="row"><span class="nm">pre-tool-guard.py</span><span class="a">「常に赤」をコードでブロック（テスト付き）</span></div></li>
+            <li><div class="row"><span class="nm">context-pressure.py / persona-reminder.py</span><span class="a">コンテキスト残量・人格のリマインド</span></div></li>
             <li><div class="row"><span class="nm">pre-compact-sleep.sh / log-agent-model.py</span><span class="a">圧縮前の睡眠・委任モデルの実測ログ</span></div></li>
             <li><div class="row"><span class="nm">*-worker.sh</span><span class="a">外部ワーカーの呼び出し口</span><button class="lyr" type="button" data-goto="5">層⑤</button></div></li>
           </ul></details></li>
@@ -1117,10 +1118,10 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
           <ul>
             <li><div class="row"><span class="nm">board.md / README.md</span><span class="a">看板ボード・運用ルール</span></div></li>
             <li><div class="row"><span class="nm dir">reviews/ ・ healthcheck/ ・ diet/</span><span class="a">レビュー記録・点検ログ・整理ログ</span></div></li>
-            <li><div class="row"><span class="nm dir">sleep/ ・ decisions/ ・ evidence/</span><span class="a">睡眠の記録・決裁の監査・証跡</span></div></li>
+            <li><div class="row"><span class="nm dir">sleep/ ・ decisions/ ・ evidence/</span><span class="a">睡眠の記録・判断ルールの監査・証跡</span></div></li>
             <li><div class="row"><span class="nm dir">model-usage/ ・ automation/</span><span class="a">委任モデルの実測・夜間ルーチン定義</span></div></li>
           </ul></details></li>
-        <li class="group-gap"><div class="row"><span class="nm dir">docs/reference/</span><span class="a">オンデマンドで読む詳細資料（決裁の全表・カタログ等）</span></div></li>
+        <li class="group-gap"><div class="row"><span class="nm dir">docs/reference/</span><span class="a">オンデマンドで読む詳細資料（判断のルールの全表・カタログ等）</span></div></li>
         <li><div class="row"><span class="nm dir">projects/…/memory/</span><span class="a">MEMORY.md＋100の記憶ファイル</span><button class="lyr" type="button" data-goto="2">層②</button></div></li>
         <li><div class="row"><span class="nm dir">inbox/</span><span class="a">読み込ませたいファイルの置き場</span></div></li>
         <li><div class="row"><span class="nm dir">outbox/</span><span class="a">成果物の置き場</span></div></li>
@@ -1135,8 +1136,8 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
   <div class="wrap-wide">
     <div class="fig-head">
       <p class="fig-no">一覧</p>
-      <h2 id="lists-title">スキルと助っ人AIの全部</h2>
-      <p class="lead">図から降りてくる二次層です。名前・説明で絞り込めます。</p>
+      <h2 id="lists-title">スキルと助っ人AIの一覧</h2>
+      <p class="lead">図に出てきたスキルと助っ人AIを、すべて一覧にしています。名前や説明で絞り込めます。</p>
 {{MONET lists}}
     </div>
 
@@ -1187,9 +1188,9 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
       <h3>隣に置く資産ライブラリ</h3>
       <p class="note" style="margin-top:6px">スキルが「具体値」を引くための、<span class="mono">~/.claude/</span> の外にあるデータ置き場です。</p>
       <div class="libs">
-        <div class="lib"><h3>design-library</h3><div class="ten">Web UI の世界観</div><p>配色（雰囲気別）・部品・CSS アニメの系統・タイポグラフィ・知識（色・アイコン・ロゴ・UI スタック）を持つ。新規UIは design-creator → ここで具体値を補強 → frontend-design の3段で回します。</p><ul class="chips"><li>colors</li><li>parts</li><li>animations</li><li>typography</li><li>knowledge</li></ul></div>
-        <div class="lib"><h3>video-library</h3><div class="ten">動画編集の部品と知識</div><p>テロップの型（165スタイル）・トランジション・実測した動きの数値・文字の出入りの部品（860部品）を、ブラウザで開くだけの倉庫（gallery）つきで持つ。Remotion スキル群の素材になります。</p><ul class="chips"><li>telop 169</li><li>kinetic 860</li><li>motion</li></ul></div>
-        <div class="lib"><h3>doc-standards</h3><div class="ten">工程ドキュメントの粒度標準</div><p>要件・基本設計・詳細設計・テスト仕様と、アジャイル系（ユーザーストーリー・受入基準・Design Doc・ADR・RFC・PR-FAQ）のレシピと採点基準。doc-standard スキルが生成と逸脱チェックに使います。</p><ul class="chips"><li>waterfall</li><li>agile</li><li>rubric</li></ul></div>
+        <div class="lib"><h3>design-library</h3><div class="ten">Web UI の世界観</div><p>配色（雰囲気別）・部品・CSS アニメの系統・タイポグラフィ・知識（色・アイコン・ロゴ・UI スタック）を持ちます。新規UIは、design-creator で意図を決め、ここで具体値を補強してから frontend-design で実装する、の3段で作ります。</p><ul class="chips"><li>colors</li><li>parts</li><li>animations</li><li>typography</li><li>knowledge</li></ul></div>
+        <div class="lib"><h3>video-library</h3><div class="ten">動画編集の部品と知識</div><p>テロップの型（169スタイル）・トランジション・実測した動きの数値・文字の出入りの部品（860部品）を、ブラウザで開けば見られる一覧（gallery）つきで持ちます。Remotion スキル群が素材として使います。</p><ul class="chips"><li>telop 169</li><li>kinetic 860</li><li>motion</li></ul></div>
+        <div class="lib"><h3>doc-standards</h3><div class="ten">工程ドキュメントの粒度標準</div><p>要件・基本設計・詳細設計・テスト仕様と、アジャイル系（ユーザーストーリー・受入基準・Design Doc・ADR・RFC・PR-FAQ）のレシピと採点基準を置いています。doc-standard スキルが生成と逸脱チェックに使います。</p><ul class="chips"><li>waterfall</li><li>agile</li><li>rubric</li></ul></div>
       </div>
     </div>
   </div>
@@ -1200,8 +1201,8 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
   <div class="wrap-wide foot-grid">
 {{MONET foot}}
     <div>
-      <p class="foot-q">静かに壊れない仕組みを。</p>
-      <p class="foot-p">「自律型AIエージェント組織」の運用化を目指した構成です。記録による引き継ぎ・眠りによる整理・定期点検により、セッションごとに7層が連携し、システムの健全性を維持します。案内役のモネは、この構成の上で実際に動いている人格です。</p>
+      <p class="foot-q">静かに壊れない構成を目指しています。</p>
+      <p class="foot-p">「自律型AIエージェント組織」という考え方を、個人の運用に落とし込んだ構成です。記録による引き継ぎ・睡眠による整理・定期点検によって、会話を重ねても設定や記憶の不整合が放置されないようにしています。案内役のモネは、この構成の上で実際に動いている人格です。</p>
       <p class="disclaimer">Anthropic の公式ページではありません。個人の Claude Code 構成図です。</p>
       <p class="meta">design-creator → design-library → frontend-design ／ 2026-09-30</p>
     </div>
@@ -1391,11 +1392,11 @@ const WORKERS = {
   'luna-codex-worker': {d:'区切られた実装・バグ修正・リファクタ・テスト更新。Codex CLI 経由で GPT-5.6 Luna が実処理します。Codex の柱1（実装）。', s:'実装の規模しだい', b:'目的と受入条件が明確なときだけ'},
   'codex-image-worker': {d:'GPT Image 2.5 で画像を1枚生成（UIアイコン・テクスチャ・背景・参考画像・サムネイル）。生成は OpenAI 側で行われ、ローカル GPU は使いません。透過指定に対応し、不透明で返ったら再生成します。Codex の柱2（画像生成）。', s:'実測 40〜75秒／枚', b:'使う前に画像を目で確認する'},
   'qwen-local-worker': {d:'ローカルの Qwen3.8 27B による読み取り専用の探索・要約・棚卸し・一次比較。マシンの外へ出ないため、機密を含む調査はここだけです。', s:'待てるとき向け・単一スロット', b:'塞がっていれば Luna か本流へ戻す'},
-  'gemini-worker': {d:'Gemini（Antigravity CLI）で散文・下書き・翻訳・書き直し・要約を1本書く。全ツールを無効化しており、ファイルは読めません（文脈は依頼文へ埋める）。', s:'実測 8〜13秒', b:'待たせる場面にも出せる唯一の外部ワーカー'},
-  'gemini-probe-worker': {d:'Gemini による急ぎの読み取り調査。フックが「読み取りツールのみ・指定ディレクトリ配下のみ」に制限し、ファイル一覧は起動時に渡します。', s:'実測 24〜26秒', b:'渡したディレクトリが境界のすべて'},
+  'gemini-worker': {d:'Gemini（Antigravity CLI）で散文・下書き・翻訳・書き直し・要約を1本書く。全ツールを無効化しており、ファイルは読めません（必要な情報は依頼文に書き込む）。', s:'実測 8〜13秒', b:'利用者を待たせる場面でも使える唯一の外部ワーカー'},
+  'gemini-probe-worker': {d:'Gemini による急ぎの読み取り調査。フックが「読み取りツールのみ・指定ディレクトリ配下のみ」に制限し、ファイル一覧は起動時に渡します。', s:'実測 24〜26秒', b:'渡したディレクトリの外は読めない'},
   'glm-worker': {d:'CompactifAI の glm-5-3（推論モデル）による段階的な分析・原因追跡・構造レビューの一次案。', s:'遅い（実測 約218秒）', b:'待たされてよい非同期の調査専用'},
   'quasar-worker': {d:'CompactifAI の quasar-438b による、待てる読み取り調査（探索・要約・棚卸し・一次比較）。ローカルが塞がっているときの受け皿です。', s:'遅い（実測 約310秒）', b:'待たされてよい非同期の調査専用'},
-  'comfy-image-worker': {d:'ローカルで画像を生成する別系統。実行で開発環境ごと落ちる不具合が起きたため、原因が分かるまで使用停止としています。', s:'停止中', b:'画像は codex-image-worker が担う'}
+  'comfy-image-worker': {d:'ローカルで画像を生成する別系統。実行すると開発環境（WSL）ごと停止する不具合が起きたため、原因が分かるまで使用停止としています。', s:'停止中', b:'画像は codex-image-worker が担う'}
 };
 const graph = document.getElementById('graph');
 const graphSvg = document.getElementById('graph-lines');
@@ -1512,8 +1513,8 @@ if(SHEET_MQ.matches) document.querySelectorAll('.tree details[data-sp-close]').f
 
 /* ======================= 一覧データ ======================= */
 const SKILLS=[
- {g:"デザイン・UI（6）",items:[["design-creator","ヒアリングを通じてデザイン仕様書（DESIGN.md）を作る"],["design-extractor","既存サイトのURLからデザイン情報を抽出する"],["design-generator","条件を指定して、デザイン仕様書をゼロから起こす"],["design-to-mock","デザイン仕様書からHTMLの試作ページを生成する"],["frontend-design","量産的なAI美学を避けた高品質なフロントエンドUIを作る"],["vercel-react-best-practices","React/Next.js の性能最適化ルールを適用する"]]},
- {g:"運用・自己管理・判断（10）",items:[["sleep","蓄積した情報を記憶と看板へ蒸留する睡眠の儀式（手動＋圧縮前の自動）"],["diet","月次で看板・記憶・成果物の不要物を整理し軽量化する"],["healthcheck","設定の不整合を検査し、問題を看板へ自動投入する"],["nightly","夜間自動ルーチンの設計管理（現状は設計のみ）"],["review-handoff","完成した成果物を2名体制で並行レビューにかける"],["santa-method","独立2レビュアの両方が合格するまで出荷しない敵対的レビュー"],["council","曖昧な意思決定を4つの声の不一致にかけてから選ぶ"],["context-budget","常時読み込む要素のトークン消費を測定し、肥大を可視化する"],["architecture-decision-records","設計判断を文脈・代替案・却下理由つきで記録する（ADR）"],["pink-elephant-guard","却下した要素が完成稿へ再登場するのを防ぐ"]]},
+ {g:"デザイン・UI（6）",items:[["design-creator","ヒアリングを通じてデザイン仕様書（DESIGN.md）を作る"],["design-extractor","既存サイトのURLからデザイン情報を抽出する"],["design-generator","条件を指定して、デザイン仕様書をゼロから起こす"],["design-to-mock","デザイン仕様書からHTMLの試作ページを生成する"],["frontend-design","ありがちなAI生成の見た目を避けた、質の高いフロントエンドUIを作る"],["vercel-react-best-practices","React/Next.js の性能最適化ルールを適用する"]]},
+ {g:"運用・自己管理・判断（10）",items:[["sleep","溜まった情報の要点を記憶と看板へ書き出す「睡眠」の手順（手動＋圧縮前の自動）"],["diet","月次で看板・記憶・成果物の不要物を整理し軽量化する"],["healthcheck","設定の不整合を検査し、問題を看板へ自動投入する"],["nightly","夜間自動ルーチンの設計管理（現状は設計のみ）"],["review-handoff","完成した成果物を2名体制で並行レビューにかける"],["santa-method","独立した2人のレビュアーが両方合格を出すまで完成としない敵対的レビュー"],["council","曖昧な意思決定について、4つの立場から異論を出させてから選ぶ"],["context-budget","常時読み込む要素のトークン消費を測定し、肥大を可視化する"],["architecture-decision-records","設計判断を文脈・代替案・却下理由つきで記録する（ADR）"],["pink-elephant-guard","却下した要素が完成稿へ再登場するのを防ぐ"]]},
  {g:"コード・文書・スキル作成（5）",items:[["coding-principles","命名・コメント・構造などコーディングの判断指針を適用する"],["doc-standard","工程ドキュメント19種の粒度標準に沿った生成と逸脱チェック"],["japanese-tech-writing","日本語の技術文書の構成と論証の規範"],["skill-creator-v2","新しいスキルの作成・既存スキルの改善と測定"],["find-skills","必要な機能のスキルを発見し、導入を補助する"]]},
  {g:"物語・キャラ・ログ（6）",items:[["novel-craft","小説の地の文・視点・セリフなど日本語散文の作法"],["character-persona-builder","キャラの人格を証拠ベースで分析し再利用できる形にする（ChatGPT と共有）"],["persona-loader","保存済みのペルソナを読み込んで適用する（ChatGPT と共有）"],["log-to-scenario","長い会話ログを過不足のない要約に変換する"],["trpg-session-to-page","TRPGの卓ログを、発言の帰属を厳密に分けてまとめ化する"],["discord-log-browser","ブラウザ経由でDiscordのログを抽出する（設計のみ）"]]},
  {g:"動画・Remotion（12）",items:[["remotion-best-practices","Remotion 系スキル全体への入口（ルーター）"],["remotion-create","Remotion プロジェクトの新規作成"],["remotion-captions","字幕の生成・表示"],["remotion-markup","演出の記述（マークアップ）"],["remotion-render","動画の書き出し"],["remotion-studio","Remotion Studio の操作"],["remotion-docs","Remotion 公式ドキュメントの参照"],["remotion-interactivity","インタラクティブな動画表現"],["remotion-maps","地図を使った動画表現"],["remotion-multimedia","音声・映像素材の扱い"],["remotion-saas","SaaS 向けの動画テンプレ"],["remotion-upgrade","Remotion のバージョン更新"]]},
@@ -1521,7 +1522,7 @@ const SKILLS=[
  {g:"Supabase 監査・支援（26）",items:[["supabase","Supabase 全般の操作・参照"],["supabase-pentest","Supabase セキュリティ監査を段階実行で統括する"],["supabase-detect","対象プロジェクトの検出"],["supabase-help","Supabase 監査の使い方案内"],["supabase-postgres-best-practices","Postgres の性能・設計のベストプラクティス"],["supabase-extract-url","接続先URLの抽出"],["supabase-extract-anon-key","公開キーの抽出（自分の環境の点検用）"],["supabase-extract-service-key","サービスキーの露出有無の点検"],["supabase-extract-jwt","JWT の抽出・検査"],["supabase-extract-db-string","DB接続文字列の露出有無の点検"],["supabase-audit-auth-config","認証設定の監査"],["supabase-audit-auth-signup","サインアップ設定の監査"],["supabase-audit-auth-users","ユーザー情報の露出監査"],["supabase-audit-authenticated","認証済みロールの権限監査"],["supabase-audit-rls","行レベルセキュリティの監査"],["supabase-audit-rpc","RPC 関数の公開範囲の監査"],["supabase-audit-functions","データベース関数の監査"],["supabase-audit-realtime","Realtime の公開範囲の監査"],["supabase-audit-tables-list","テーブル一覧の列挙"],["supabase-audit-tables-read","テーブルの読み取り可否の監査"],["supabase-audit-buckets-list","ストレージバケットの列挙"],["supabase-audit-buckets-public","公開バケットの監査"],["supabase-audit-buckets-read","バケットの読み取り可否の監査"],["supabase-evidence","監査の証跡の記録"],["supabase-report","監査レポートの生成"],["supabase-report-compare","監査レポート同士の差分比較"]]}
 ];
 const AGENTS=[
- ["起動可 · 外部モデルワーカー",[["luna-codex-worker","GPT-5.6 Luna（Codex経由）へ区切られた実装を渡す殻"],["qwen-local-worker","ローカル Qwen3.8 27B の読み取り専用調査ワーカー"],["gemini-worker","Gemini の文章生成ワーカー（最速・ファイルは読めない）"],["gemini-probe-worker","Gemini の急ぎの読み取り調査ワーカー"],["quasar-worker","quasar-438b の待てる読み取り調査ワーカー"],["glm-worker","glm-5-3（推論型）の段階的分析ワーカー"],["codex-image-worker","Codex 経由の GPT Image 2.5 画像生成ワーカー（1枚ずつ）"],["comfy-image-worker","ローカル画像生成ワーカー（停止中・使用しない）"]]],
+ ["起動可 · 外部モデルワーカー",[["luna-codex-worker","GPT-5.6 Luna（Codex経由）へ区切られた実装を渡す中継役"],["qwen-local-worker","ローカル Qwen3.8 27B の読み取り専用調査ワーカー"],["gemini-worker","Gemini の文章生成ワーカー（最速・ファイルは読めない）"],["gemini-probe-worker","Gemini の急ぎの読み取り調査ワーカー"],["quasar-worker","quasar-438b の待てる読み取り調査ワーカー"],["glm-worker","glm-5-3（推論型）の段階的分析ワーカー"],["codex-image-worker","Codex 経由の GPT Image 2.5 画像生成ワーカー（1枚ずつ）"],["comfy-image-worker","ローカル画像生成ワーカー（停止中・使用しない）"]]],
  ["起動可 · GPT チーム（claudex 会話専用）",[["terra-architect","claudex 会話専用: GPT-5.6 Terra による設計・分析"],["luna-implementer","claudex 会話専用: GPT-5.6 Luna による実装"],["sol-reviewer","claudex 会話専用: GPT-5.6 Sol による最終レビュー"],["model-team-guide","Sol・Terra・Luna の3体チームの使い分け案内"]]],
  ["起動可 · 小説執筆チーム",[["novel-character-developer","小説: キャラクターの造形"],["novel-continuity-editor","小説: 設定・時系列の整合チェック"],["novel-planner","小説: 全体の企画・構成"],["novel-plot-architect","小説: プロットの設計"],["novel-revision-doctor","小説: 推敲・改稿の診断"],["novel-scene-writer","小説: 場面の執筆"],["novel-worldbuilder","小説: 世界観の構築"]]],
  ["起動可 · A. 言語特化",[["typescript-pro","TypeScriptの型システム・型安全を突き詰める"],["javascript-pro","最新JavaScript・非同期・性能の最適化"],["node-specialist","Node.jsのAPI・CLI・バックエンド"],["python-pro","型安全なPython・非同期・複雑なアプリ"]]],
