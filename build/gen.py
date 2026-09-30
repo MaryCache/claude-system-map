@@ -26,8 +26,11 @@ for n in range(1,8):
 tile='assets/illust/paper-tile.webp' if os.path.exists(f'{ROOT}/assets/illust/paper-tile.webp') else None
 s=s.replace('  /* PAPER_TILE */\n', f'  background-image:url("{tile}");background-size:600px 600px;\n' if tile else '')
 
-logo=open(f'{ROOT}/assets/logo/system-map-symbol.svg',encoding='utf-8').read().strip()
-s=s.replace('{{LOGO_SVG}}',logo.replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">','<svg viewBox="0 0 100 100" aria-hidden="true">'))
+# ヘッダーは文字ロゴだけ（シンボルはファビコンと OG に回す・かしぇ 2026-09-30）。リンク側に aria-label があるので、
+# 埋め込む SVG は読み上げから外す。部品の id（wm-*）はページ内で一意なのでそのまま残し、動きの CSS から指す
+wm=open(f'{ROOT}/assets/logo/system-map-wordmark.svg',encoding='utf-8').read().strip()
+wm=wm.replace('xmlns="http://www.w3.org/2000/svg" ','').replace(' role="img" aria-label="Claude System Map"',' aria-hidden="true" focusable="false"')
+s=s.replace('{{WORDMARK_SVG}}',wm)
 
 # 小さなモネ：ドット絵（assets/monet/pixel/）を優先。見出しごとに別の表情・仕草にする（かしぇ 2026-09-30）。場面に合う名前のものが無ければ monet-idle、
 # それも無ければシートの切り抜き（円の窓）に倒す。raw/ は使わない。

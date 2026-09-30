@@ -106,8 +106,8 @@ p{margin:0;text-wrap:pretty}
 }
 .site-head .bar{display:flex;align-items:center;gap:24px;height:var(--header-h)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
-.brand svg{width:30px;height:30px}
-.brand b{font-family:var(--font-sans);font-weight:600;font-size:17px;letter-spacing:-.01em}
+/* 文字ロゴの高さ。線の折れ（ディセンダーの下）まで含めた高さなので、字の大きさは本文の見出し程度になる */
+.brand svg{height:28px;width:auto;display:block;overflow:visible}
 .site-nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
 .site-nav::-webkit-scrollbar{display:none}
 .site-nav a{
@@ -600,6 +600,104 @@ p{margin:0;text-wrap:pretty}
 }
 @media (min-width:861px){ .sheet{display:none} }
 
+/* ================= 動き（入場） =================
+   数値は design-library/knowledge/motion/yui540.md の実測の型から取る：
+   長さ 700ms・ずらしは全体 0.36s を要素数で割る・不透明度は前半 20% で出し切る（型G）・
+   動かすのは transform と opacity だけ。.rv は JS が「動きを減らす」設定でないときだけ付ける＝
+   reduce の人と JS なしでは最初から最後の姿で出る。 */
+:root{
+  /* 署名的な強い ease-in-out。線・パネル・ワイプに使う */
+  --ease-io:cubic-bezier(.87,.05,.02,.97);
+  /* 初速の出る減速（わずかに行き過ぎる）。入場と、ホバーで浮かせる動きに使う */
+  --ease-snap:cubic-bezier(0,.56,.15,1.01);
+  /* 加速して去る。退場に使う */
+  --ease-exit:cubic-bezier(.74,.03,1,1);
+}
+.rv{opacity:0}
+.rv.in{animation:rv-rise .7s var(--ease-snap) var(--rv-d,0s) both}
+@keyframes rv-rise{0%{opacity:0;transform:translateY(18px)}20%{opacity:1}100%{opacity:1;transform:none}}
+/* 吹き出しは型A（行き過ぎて戻る）。支点は尾の付け根（右下） */
+.bubble.rv.in{animation-name:rv-pop;animation-duration:.6s;animation-timing-function:ease-in-out;transform-origin:85% 100%}
+@keyframes rv-pop{0%{opacity:0;transform:scale(.6)}15%{opacity:1}50%{transform:scale(1.06)}75%{transform:scale(.98)}100%{opacity:1;transform:none}}
+/* 案内役の立ち絵は下からせり上がる（マスクの縁から出てくる） */
+.guide img.rv.in{animation-name:rv-up;animation-duration:.8s}
+@keyframes rv-up{0%{opacity:0;transform:translateY(40px)}20%{opacity:1}100%{opacity:1;transform:none}}
+/* 層を貫く線は上から引く。層のボタンが並び終わる頃に下端へ着く */
+.trace .spine.draw-in{stroke-dasharray:100;animation:draw .9s var(--ease-io) .35s both}
+.trace .stub,.trace .elbow{transition:opacity .4s ease}
+/* 線の左の短い棒と、選んだ層から右へ出る折れは、縦の線が引き終わってから出す（先に見えると線が宙に浮く） */
+.trace.pre .stub,.trace.pre .elbow{opacity:0}
+/* ヘッダーの文字ロゴ：l の線が上から降り、字が1字ずつ浮かび、最後に線が右へ折れて単語の下を抜ける（型E：分割して連結）。
+   字のずらしは JS が --i を振る（15字 × 0.024s ≈ 全体 0.36s） */
+.brand #wm-spine,.brand #wm-elbow,.brand .wm-ch{transform-box:fill-box}
+.brand.intro #wm-spine{transform-origin:50% 0;animation:lg-spine .6s var(--ease-io) .1s both}
+.brand.intro .wm-ch{animation:lg-ch .6s var(--ease-snap) calc(.35s + var(--i,0) * .024s) both}
+.brand.intro #wm-elbow{transform-origin:0 50%;animation:lg-elbow .55s var(--ease-io) .8s both}
+@keyframes lg-ch{0%{opacity:0;transform:translateY(30%)}20%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes lg-spine{from{transform:scaleY(0)}}
+@keyframes lg-elbow{from{transform:scaleX(0)}}
+::view-transition-old(layer-detail){animation-duration:.24s;animation-timing-function:var(--ease-exit)}
+::view-transition-new(layer-detail){animation-duration:.34s;animation-timing-function:var(--ease-snap)}
+
+/* ================= 動き（ホバー・PC だけ） =================
+   マウスで指せる端末に限る（タッチでは :hover が押したあと残るため）。動きを減らす設定では付けない。
+   浮かせる量は 2〜6px に抑える：図の線（委任グラフ・層の線）が要素の縁につながっていて、大きく動かすと離れて見える。 */
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  /* 文字ロゴ：折れた線が少し先へ伸び、字がわずかに持ち上がる（線が字の下を通り抜けていく感じを足す）。
+     translateY は viewBox の単位（高さ 28px に 2535 単位）なので -60 で約 0.7px＝ごく小さく浮く */
+  .brand #wm-elbow{transition:transform .5s var(--ease-snap)}
+  .brand:hover #wm-elbow{transform:scaleX(1.05)}
+  .brand .wm-letters{transition:transform .5s var(--ease-snap)}
+  .brand:hover .wm-letters{transform:translateY(-60px)}
+
+  /* 案内役：少し身を乗り出し、吹き出しも追って揺れる */
+  .guide img{transform-origin:50% 100%;transition:transform .6s var(--ease-snap)}
+  .guide:hover img{transform:translateY(-6px) rotate(-1.5deg)}
+  .bubble{transition:transform .6s var(--ease-snap) .05s}
+  .guide:hover .bubble{transform:translateY(-3px) rotate(1deg)}
+
+  /* ドット絵のモネ：うなずきを2回（小さな合図は2回）。1ドット＝--s 画素の格子で動かし、にじませない */
+  .sprite:hover img{animation:nod .5s steps(1,end) 2}
+  @keyframes nod{0%{transform:none}25%{transform:translateY(calc(var(--s) * 2px))}60%{transform:translateY(calc(var(--s) * 1px))}85%{transform:none}}
+
+  /* 層のボタン：右へ寄り、挿絵が少し回って大きくなる */
+  .layer-btn{transition:border-color .2s ease,background-color .2s ease,transform .45s var(--ease-snap)}
+  .layer-btn:hover{transform:translateX(3px)}
+  .layer-btn .thumb{transition:transform .5s var(--ease-snap)}
+  .layer-btn:hover .thumb{transform:scale(1.14) rotate(-6deg)}
+  .layer-btn:hover .chev{transform:translateY(2px)}
+  .layer-btn[aria-pressed="true"]:hover .chev{transform:rotate(-90deg) translateY(-2px)}
+  /* 詳細パネルの挿絵：指しているあいだだけ呼吸する（周期 1.05s） */
+  .ld-illust{transition:transform .5s var(--ease-snap)}
+  .ld-head:hover .ld-illust{animation:breathe 1.05s ease-in-out infinite alternate}
+  @keyframes breathe{from{transform:translateY(0) rotate(0)}to{transform:translateY(-4px) rotate(-2deg)}}
+
+  /* カード類：少し浮いて枠が濃くなり、見出しのアイコンが傾く */
+  .scene,.audit li,.lib,.does > div,.node:not(.center),.cell,.integrations > div,.always-red{transition:transform .45s var(--ease-snap),border-color .2s ease,box-shadow .2s ease,filter .2s ease}
+  .scene:hover,.audit li:hover,.node:not(.center):not(.group):hover{transform:translateY(-3px);border-color:var(--line-strong)}
+  .lib:hover,.does > div:hover{transform:translateY(-3px)}
+  .cell:hover{transform:translateY(-2px)}
+  .scene h3 .icon,.does h3 .icon,.lib h3,.stat .num{transition:transform .5s var(--ease-snap)}
+  .scene:hover h3 .icon,.does > div:hover h3 .icon{transform:rotate(-10deg) scale(1.15)}
+  .lib:hover h3{transform:translateX(3px)}
+  .stat:hover .num{transform:translateY(-3px)}
+  .hooks li::before{transition:transform .4s var(--ease-snap)}
+  .hooks li:hover::before{transform:translateY(-1px) scale(1.6)}
+
+  /* 小さな操作部品 */
+  .pick,.filter,.lyr{transition:background-color .2s ease,color .2s ease,transform .4s var(--ease-snap)}
+  .pick:hover,.filter:hover{transform:translateY(-1px)}
+  .lyr:hover{transform:scale(1.06)}
+  .tree .row .nm{transition:transform .4s var(--ease-snap)}
+  .tree .row:hover .nm{transform:translateX(3px)}
+  .lgrp li .nm{transition:transform .4s var(--ease-snap)}
+  .lgrp li:hover .nm{transform:translateX(3px)}
+  .more .icon,.foot-links .icon,.gh-link .icon{transition:transform .4s var(--ease-snap)}
+  .more:hover .icon{transform:translate(2px,2px)}
+  .foot-links a:hover .icon{transform:translateX(-3px)}
+  .foot-links a[href^="http"]:hover .icon,.gh-link:hover .icon{transform:translate(2px,-2px)}
+}
+
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition-duration:0s!important;transition-delay:0s!important}
@@ -647,8 +745,15 @@ p{margin:0;text-wrap:pretty}
 <header class="site-head">
   <div class="wrap-wide bar">
     <a class="brand" href="#fig-a" aria-label="Claude System Map（ページの先頭へ）">
-      <svg viewBox="0 0 100 100" aria-hidden="true"><path fill="#4B413A" d="M13 14.55 L28.16 14.55 L28.16 27.39 L13 27.39 Z M48.16 14.55 L87 14.55 L87 27.39 L48.16 27.39 Z M13 38.88 L28.16 38.88 L28.16 51.72 L13 51.72 Z M48.16 38.88 L79 38.88 L79 51.72 L48.16 51.72 Z M13 63.21 L28.16 63.21 L28.16 76.05 L13 76.05 Z M48.16 63.21 L71 63.21 L71 76.05 L48.16 76.05 Z"/><path fill="#C25A3F" d="M34.66 3.39 L41.66 3.39 L41.66 94.21 L34.66 94.21 Z M34.66 87.21 L71.26 87.21 L71.26 94.21 L34.66 94.21 Z"/></svg>
-      <b>Claude System Map</b>
+      <svg viewBox="0 0 18305.2 2535.4" aria-hidden="true" focusable="false">
+<g class="wm-letters" fill="#4B413A">
+<g id="wm-claude"><path class="wm-ch" d="M900 1640L900 1640Q695 1640 536.5 1545Q378 1450 288 1277Q198 1104 198 872L198 872Q198 638 287.5 465Q377 292 536 197Q695 102 900 102L900 102Q1026 102 1135 139.5Q1244 177 1328.5 247.5Q1413 318 1468 416Q1523 514 1542 637L1542 637L1273 637Q1258 566 1225 510.5Q1192 455 1144 416.5Q1096 378 1035 358.5Q974 339 902 339L902 339Q766 339 668 405.5Q570 472 517 591.5Q464 711 464 872L464 872Q464 1032 516.5 1151Q569 1270 667.5 1336.5Q766 1403 902 1403L902 1403Q974 1403 1034.5 1383.5Q1095 1364 1143 1326Q1191 1288 1224.5 1233Q1258 1178 1274 1107L1274 1107L1542 1107Q1523 1229 1468 1327Q1413 1425 1328 1495Q1243 1565 1134.5 1602.5Q1026 1640 900 1640Z"/><path class="wm-ch" d="M2429.9 1633L2429.9 1633Q2324.9 1633 2242.4 1598Q2159.9 1563 2112.4 1492Q2064.9 1421 2064.9 1316L2064.9 1316Q2064.9 1226 2098.9 1167.5Q2132.9 1109 2190.9 1074Q2248.9 1039 2323.9 1020.5Q2398.9 1002 2479.9 994L2479.9 994Q2577.9 983 2635.4 974.5Q2692.9 966 2717.9 949.5Q2742.9 933 2742.9 897L2742.9 897L2742.9 889Q2742.9 843 2719.9 808.5Q2696.9 774 2653.4 754.5Q2609.9 735 2549.9 735L2549.9 735Q2488.9 735 2442.4 754.5Q2395.9 774 2368.9 808.5Q2341.9 843 2337.9 888L2337.9 888L2094.9 888Q2101.9 783 2158.4 704.5Q2214.9 626 2315.9 582.5Q2416.9 539 2554.9 539L2554.9 539Q2657.9 539 2739.4 563.5Q2820.9 588 2877.4 635Q2933.9 682 2963.4 748Q2992.9 814 2992.9 896L2992.9 896L2992.9 1616L2744.9 1616L2744.9 1467L2740.9 1467Q2715.9 1514 2675.9 1551.5Q2635.9 1589 2575.9 1611Q2515.9 1633 2429.9 1633ZM2491.9 1446L2491.9 1446Q2574.9 1446 2630.9 1416Q2686.9 1386 2715.4 1336Q2743.9 1286 2743.9 1225L2743.9 1225L2743.9 1111Q2731.9 1118 2708.9 1125Q2685.9 1132 2654.4 1138.5Q2622.9 1145 2586.4 1151Q2549.9 1157 2510.9 1163L2510.9 1163Q2456.9 1170 2411.4 1187.5Q2365.9 1205 2338.4 1235.5Q2310.9 1266 2310.9 1314L2310.9 1314Q2310.9 1355 2333.4 1385Q2355.9 1415 2396.4 1430.5Q2436.9 1446 2491.9 1446Z"/><path class="wm-ch" d="M3567.3 1637L3567.3 1637Q3457.3 1637 3372.3 1589.5Q3287.3 1542 3239.3 1448.5Q3191.3 1355 3191.3 1220L3191.3 1220L3191.3 560L3443.3 560L3443.3 1180Q3443.3 1296 3499.8 1356Q3556.3 1416 3656.3 1416L3656.3 1416Q3723.3 1416 3775.3 1389Q3827.3 1362 3857.3 1304.5Q3887.3 1247 3887.3 1157L3887.3 1157L3887.3 560L4140.3 560L4140.3 1616L3892.3 1616L3892.3 1347L3941.3 1347Q3890.3 1488 3797.8 1562.5Q3705.3 1637 3567.3 1637Z"/><path class="wm-ch" d="M4747.7 1637L4747.7 1637Q4610.7 1637 4507.2 1568Q4403.7 1499 4347.2 1375Q4290.7 1251 4290.7 1087L4290.7 1087Q4290.7 925 4347.7 801Q4404.7 677 4507.7 608Q4610.7 539 4745.7 539L4745.7 539Q4814.7 539 4874.2 557.5Q4933.7 576 4981.7 614Q5029.7 652 5063.7 710L5063.7 710L5065.7 710L5065.7 126L5317.7 126L5317.7 1616L5069.7 1616L5069.7 1455L5067.7 1455Q5034.7 1516 4986.2 1556.5Q4937.7 1597 4877.2 1617Q4816.7 1637 4747.7 1637ZM4806.7 1426L4806.7 1426Q4889.7 1426 4950.7 1384.5Q5011.7 1343 5045.7 1266.5Q5079.7 1190 5079.7 1087L5079.7 1087Q5079.7 984 5045.7 908Q5011.7 832 4950.7 790Q4889.7 748 4806.7 748L4806.7 748Q4729.7 748 4670.7 787.5Q4611.7 827 4578.7 902.5Q4545.7 978 4545.7 1087L4545.7 1087Q4545.7 1196 4578.7 1272Q4611.7 1348 4670.7 1387Q4729.7 1426 4806.7 1426Z"/><path class="wm-ch" d="M5983.2 1640L5983.2 1640Q5825.2 1640 5709.2 1569Q5593.2 1498 5530.7 1373.5Q5468.2 1249 5468.2 1089L5468.2 1089Q5468.2 928 5532.7 803Q5597.2 678 5711.2 607Q5825.2 536 5973.2 536L5973.2 536Q6087.2 536 6180.2 576Q6273.2 616 6340.2 689.5Q6407.2 763 6443.2 863.5Q6479.2 964 6479.2 1085L6479.2 1085L6479.2 1154L5568.2 1154L5568.2 980L6353.2 980L6240.2 1027Q6240.2 937 6207.7 872Q6175.2 807 6116.7 771.5Q6058.2 736 5977.2 736L5977.2 736Q5897.2 736 5838.2 771.5Q5779.2 807 5747.2 872Q5715.2 937 5715.2 1027L5715.2 1027L5715.2 1136Q5715.2 1227 5747.2 1296Q5779.2 1365 5840.7 1403Q5902.2 1441 5989.2 1441L5989.2 1441Q6052.2 1441 6101.2 1422Q6150.2 1403 6183.2 1369Q6216.2 1335 6230.2 1290L6230.2 1290L6466.2 1290Q6446.2 1393 6378.7 1472Q6311.2 1551 6209.2 1595.5Q6107.2 1640 5983.2 1640Z"/></g>
+<g id="wm-system"><path class="wm-ch" d="M7550.2 1640L7550.2 1640Q7366.2 1640 7234.2 1579Q7102.2 1518 7031.2 1404Q6960.2 1290 6960.2 1130L6960.2 1130L7219.2 1130Q7220.2 1220 7260.2 1284.5Q7300.2 1349 7374.7 1383Q7449.2 1417 7552.2 1417L7552.2 1417Q7645.2 1417 7714.7 1390.5Q7784.2 1364 7822.7 1315.5Q7861.2 1267 7861.2 1202L7861.2 1202Q7861.2 1149 7833.2 1110Q7805.2 1071 7744.7 1042Q7684.2 1013 7584.2 990L7584.2 990L7424.2 954Q7201.2 903 7095.2 803Q6989.2 703 6989.2 546L6989.2 546Q6989.2 412 7057.7 312.5Q7126.2 213 7249.7 157.5Q7373.2 102 7537.2 102L7537.2 102Q7704.2 102 7825.7 159.5Q7947.2 217 8014.7 323.5Q8082.2 430 8086.2 578L8086.2 578L7835.2 578Q7827.2 460 7747.2 393Q7667.2 326 7536.2 326L7536.2 326Q7454.2 326 7390.2 352.5Q7326.2 379 7290.2 425.5Q7254.2 472 7254.2 533L7254.2 533Q7254.2 583 7281.7 619.5Q7309.2 656 7368.7 684Q7428.2 712 7525.2 734L7525.2 734L7676.2 769Q7792.2 795 7876.7 832.5Q7961.2 870 8016.2 921Q8071.2 972 8097.7 1038Q8124.2 1104 8124.2 1186L8124.2 1186Q8124.2 1325 8054.2 1427Q7984.2 1529 7855.2 1584.5Q7726.2 1640 7550.2 1640Z"/><path class="wm-ch" d="M8303.6 2034L8303.6 2034L8303.6 1829L8428.6 1829Q8462.6 1829 8486.1 1817Q8509.6 1805 8527.1 1779Q8544.6 1753 8558.6 1712L8558.6 1712L8597.6 1610L8190.6 560L8457.6 560L8651.6 1110Q8681.6 1198 8709.1 1285.5Q8736.6 1373 8762.6 1460L8762.6 1460L8692.6 1460Q8717.6 1373 8745.6 1285Q8773.6 1197 8803.6 1110L8803.6 1110L8996.6 560L9260.6 560L8788.6 1790Q8756.6 1872 8711.6 1926.5Q8666.6 1981 8606.1 2007.5Q8545.6 2034 8468.6 2034L8468.6 2034Q8428.6 2034 8386.6 2034Q8344.6 2034 8303.6 2034Z"/><path class="wm-ch" d="M9760.0 1641L9760.0 1641Q9632.0 1641 9530.0 1600.5Q9428.0 1560 9366.0 1481.5Q9304.0 1403 9296.0 1290L9296.0 1290L9545.0 1290Q9553.0 1367 9607.5 1409.5Q9662.0 1452 9756.0 1452L9756.0 1452Q9847.0 1452 9899.5 1416Q9952.0 1380 9952.0 1324L9952.0 1324Q9952.0 1276 9913.5 1247Q9875.0 1218 9808.0 1204L9808.0 1204L9628.0 1167Q9476.0 1135 9398.0 1058Q9320.0 981 9320.0 862L9320.0 862Q9320.0 765 9372.5 692Q9425.0 619 9520.5 578Q9616.0 537 9745.0 537L9745.0 537Q9873.0 537 9970.5 580Q10068.0 623 10123.5 701.5Q10179.0 780 10182.0 889L10182.0 889L9945.0 889Q9944.0 818 9890.5 772Q9837.0 726 9751.0 726L9751.0 726Q9668.0 726 9620.0 763Q9572.0 800 9572.0 854L9572.0 854Q9572.0 901 9609.0 930.5Q9646.0 960 9712.0 975L9712.0 975L9902.0 1014Q10059.0 1047 10133.5 1118Q10208.0 1189 10208.0 1305L10208.0 1305Q10208.0 1408 10150.5 1483.5Q10093.0 1559 9992.0 1600Q9891.0 1641 9760.0 1641Z"/><path class="wm-ch" d="M10280.5 560L10932.5 560L10932.5 763L10280.5 763L10280.5 560ZM10464.5 1350L10464.5 272L10717.5 272L10717.5 1313Q10717.5 1369 10740.5 1391Q10763.5 1413 10824.5 1413L10824.5 1413Q10849.5 1413 10881.5 1413Q10913.5 1413 10932.5 1413L10932.5 1413L10932.5 1616Q10906.5 1616 10864.0 1616Q10821.5 1616 10780.5 1616L10780.5 1616Q10618.5 1616 10541.5 1550.5Q10464.5 1485 10464.5 1350L10464.5 1350Z"/><path class="wm-ch" d="M11516.9 1640L11516.9 1640Q11358.9 1640 11242.9 1569Q11126.9 1498 11064.4 1373.5Q11001.9 1249 11001.9 1089L11001.9 1089Q11001.9 928 11066.4 803Q11130.9 678 11244.9 607Q11358.9 536 11506.9 536L11506.9 536Q11620.9 536 11713.9 576Q11806.9 616 11873.9 689.5Q11940.9 763 11976.9 863.5Q12012.9 964 12012.9 1085L12012.9 1085L12012.9 1154L11101.9 1154L11101.9 980L11886.9 980L11773.9 1027Q11773.9 937 11741.4 872Q11708.9 807 11650.4 771.5Q11591.9 736 11510.9 736L11510.9 736Q11430.9 736 11371.9 771.5Q11312.9 807 11280.9 872Q11248.9 937 11248.9 1027L11248.9 1027L11248.9 1136Q11248.9 1227 11280.9 1296Q11312.9 1365 11374.4 1403Q11435.9 1441 11522.9 1441L11522.9 1441Q11585.9 1441 11634.9 1422Q11683.9 1403 11716.9 1369Q11749.9 1335 11763.9 1290L11763.9 1290L11999.9 1290Q11979.9 1393 11912.4 1472Q11844.9 1551 11742.9 1595.5Q11640.9 1640 11516.9 1640Z"/><path class="wm-ch" d="M12411.3 1616L12159.3 1616L12159.3 560L12403.3 560L12403.3 790L12384.3 790Q12413.3 706 12463.8 650Q12514.3 594 12580.8 566.5Q12647.3 539 12721.3 539L12721.3 539Q12843.3 539 12931.3 608.5Q13019.3 678 13039.3 790L13039.3 790L13006.3 790Q13027.3 715 13077.8 658.5Q13128.3 602 13201.3 570.5Q13274.3 539 13361.3 539L13361.3 539Q13461.3 539 13541.3 582Q13621.3 625 13668.3 710Q13715.3 795 13715.3 919L13715.3 919L13715.3 1616L13462.3 1616L13462.3 955Q13462.3 851 13404.8 802Q13347.3 753 13266.3 753L13266.3 753Q13203.3 753 13156.8 780.5Q13110.3 808 13084.8 856Q13059.3 904 13059.3 968L13059.3 968L13059.3 1616L12814.3 1616L12814.3 943Q12814.3 857 12760.3 805Q12706.3 753 12622.3 753L12622.3 753Q12566.3 753 12517.8 779.5Q12469.3 806 12440.3 858Q12411.3 910 12411.3 986L12411.3 986L12411.3 1616Z"/></g>
+<g id="wm-map"><path class="wm-ch" d="M14559.3 1616L14299.3 1616L14299.3 126L14679.3 126L14969.3 909Q14984.3 952 15003.8 1013Q15023.3 1074 15044.3 1141Q15065.3 1208 15083.8 1268Q15102.3 1328 15113.3 1368L15113.3 1368L15048.3 1368Q15059.3 1328 15077.3 1268Q15095.3 1208 15116.3 1141Q15137.3 1074 15156.8 1013Q15176.3 952 15190.3 909L15190.3 909L15475.3 126L15857.3 126L15857.3 1616L15597.3 1616L15597.3 856Q15597.3 807 15598.3 742.5Q15599.3 678 15601.8 606.5Q15604.3 535 15605.8 461.5Q15607.3 388 15608.3 321L15608.3 321L15641.3 321Q15617.3 397 15593.3 474.5Q15569.3 552 15546.3 623.5Q15523.3 695 15503.8 754.5Q15484.3 814 15470.3 856L15470.3 856L15186.3 1616L14970.3 1616L14684.3 856Q14670.3 814 14649.8 754.5Q14629.3 695 14606.3 623.5Q14583.3 552 14558.3 474.5Q14533.3 397 14508.3 321L14508.3 321L14548.3 321Q14550.3 388 14551.8 461.5Q14553.3 535 14555.3 606.5Q14557.3 678 14558.3 742.5Q14559.3 807 14559.3 856L14559.3 856L14559.3 1616Z"/><path class="wm-ch" d="M16390.8 1633L16390.8 1633Q16285.8 1633 16203.3 1598Q16120.8 1563 16073.3 1492Q16025.8 1421 16025.8 1316L16025.8 1316Q16025.8 1226 16059.8 1167.5Q16093.8 1109 16151.8 1074Q16209.8 1039 16284.8 1020.5Q16359.8 1002 16440.8 994L16440.8 994Q16538.8 983 16596.3 974.5Q16653.8 966 16678.8 949.5Q16703.8 933 16703.8 897L16703.8 897L16703.8 889Q16703.8 843 16680.8 808.5Q16657.8 774 16614.3 754.5Q16570.8 735 16510.8 735L16510.8 735Q16449.8 735 16403.3 754.5Q16356.8 774 16329.8 808.5Q16302.8 843 16298.8 888L16298.8 888L16055.8 888Q16062.8 783 16119.3 704.5Q16175.8 626 16276.8 582.5Q16377.8 539 16515.8 539L16515.8 539Q16618.8 539 16700.3 563.5Q16781.8 588 16838.3 635Q16894.8 682 16924.3 748Q16953.8 814 16953.8 896L16953.8 896L16953.8 1616L16705.8 1616L16705.8 1467L16701.8 1467Q16676.8 1514 16636.8 1551.5Q16596.8 1589 16536.8 1611Q16476.8 1633 16390.8 1633ZM16452.8 1446L16452.8 1446Q16535.8 1446 16591.8 1416Q16647.8 1386 16676.3 1336Q16704.8 1286 16704.8 1225L16704.8 1225L16704.8 1111Q16692.8 1118 16669.8 1125Q16646.8 1132 16615.3 1138.5Q16583.8 1145 16547.3 1151Q16510.8 1157 16471.8 1163L16471.8 1163Q16417.8 1170 16372.3 1187.5Q16326.8 1205 16299.3 1235.5Q16271.8 1266 16271.8 1314L16271.8 1314Q16271.8 1355 16294.3 1385Q16316.8 1415 16357.3 1430.5Q16397.8 1446 16452.8 1446Z"/><path class="wm-ch" d="M17404.2 2034L17152.2 2034L17152.2 560L17400.2 560L17400.2 707L17403.2 707Q17436.2 651 17485.2 613.5Q17534.2 576 17594.7 557.5Q17655.2 539 17723.2 539L17723.2 539Q17860.2 539 17962.7 608Q18065.2 677 18122.2 801Q18179.2 925 18179.2 1087L18179.2 1087Q18179.2 1251 18122.7 1375Q18066.2 1499 17963.2 1568Q17860.2 1637 17722.2 1637L17722.2 1637Q17653.2 1637 17594.2 1617Q17535.2 1597 17487.7 1557Q17440.2 1517 17407.2 1457L17407.2 1457L17404.2 1457L17404.2 2034ZM17663.2 1426L17663.2 1426Q17741.2 1426 17799.7 1387Q17858.2 1348 17891.2 1272Q17924.2 1196 17924.2 1087L17924.2 1087Q17924.2 978 17891.2 902.5Q17858.2 827 17799.7 787.5Q17741.2 748 17663.2 748L17663.2 748Q17580.2 748 17519.2 790Q17458.2 832 17424.2 908Q17390.2 984 17390.2 1087L17390.2 1087Q17390.2 1190 17424.2 1266.5Q17458.2 1343 17519.2 1384.5Q17580.2 1426 17663.2 1426Z"/></g>
+</g>
+<path id="wm-spine" class="wm-spine" fill="#C25A3F" d="M1656.5 126H1908.5V2187.6H1656.5Z"/>
+<path id="wm-elbow" class="wm-elbow" fill="#C25A3F" d="M1656.5 2187.6H18179.2V2409.4H1656.5Z"/>
+</svg>
     </a>
     <nav class="site-nav" aria-label="図へのジャンプ">
       <a href="#fig-a" data-nav="fig-a"><span class="tag">A</span>7つの層</a>
@@ -671,7 +776,7 @@ p{margin:0;text-wrap:pretty}
       <div>
         <p class="fig-no">図A　7つの層</p>
         <h1 id="fig-a-title">Claude Code を、7つの層で動かす</h1>
-        <p class="lead">個人で使っている Claude Code の構成図です。設定ファイルを置くだけでなく、会話をまたいで記憶を残し、区切りごとに記憶を整理し直し（この構成では「睡眠」と呼びます）、専門エージェントや外部モデルに仕事を振り分け、自分の設定を点検する仕組みを、7つの層に分けて組んでいます。層を選ぶと、その層の役割と実例が開きます。</p>
+        <p class="lead">個人で使っている Claude Code の構成図です。設定ファイルを置くだけでなく、会話をまたいで記憶を残し、区切りごとに記憶を整理し直し（この構成では「睡眠」と呼びます）、専門エージェントや外部モデルに仕事を振り分け、Claude Code 自身の設定を点検する仕組みを、7つの層に分けて組んでいます。層を選ぶと、その層の役割と実例が開きます。</p>
       </div>
       <div class="guide">
         <p class="bubble"><span class="phr">わかりやすく<wbr>説明できていたら<wbr>嬉しいな</span><small>──《案内役》モネ</small></p>
@@ -682,7 +787,7 @@ p{margin:0;text-wrap:pretty}
     <div class="stack-area">
       <div>
         <div class="stack-wrap" id="stack-wrap">
-          <svg class="trace" id="trace" aria-hidden="true"><g id="trace-stubs"></g><path class="spine" id="trace-spine" d=""/><path class="elbow" id="trace-elbow" d="" pathLength="100"/></svg>
+          <svg class="trace" id="trace" aria-hidden="true"><g id="trace-stubs"></g><path class="spine" id="trace-spine" d="" pathLength="100"/><path class="elbow" id="trace-elbow" d="" pathLength="100"/></svg>
           <ol class="stack" aria-label="7つの層（上が土台、下が判断）">
             <li><button class="layer-btn" type="button" data-layer="1" aria-pressed="false" aria-controls="layer-1"><span class="no">01</span><span><span class="nm">静的設定</span><span class="rl">毎回読み込む土台・ルール</span></span><img class="thumb" src="assets/illust/layer-1.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
             <li><button class="layer-btn" type="button" data-layer="2" aria-pressed="false" aria-controls="layer-2"><span class="no">02</span><span><span class="nm">記憶</span><span class="rl">会話をまたいで覚える</span></span><img class="thumb" src="assets/illust/layer-2.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
@@ -693,14 +798,14 @@ p{margin:0;text-wrap:pretty}
             <li><button class="layer-btn" type="button" data-layer="7" aria-pressed="false" aria-controls="layer-7"><span class="no">07</span><span><span class="nm">判断のルール</span><span class="rl">緑（実行可）／黄（要確認）／赤（禁止）</span></span><img class="thumb" src="assets/illust/layer-7.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
           </ol>
         </div>
-        <p class="stack-caption">会話のたびに、この7つの層が連携して動きます。層は上から、土台 → 記憶 → 自動制御 → 実行 → 外部モデル → 運用 → 判断の順に並べています。一般的な設定と最も違うのは、3番目の層（中核）です。</p>
+        <p class="stack-caption">会話のたびに、この7つの層が連携して動きます。層は上から、土台 → 記憶 → 自動制御 → 実行 → 外部モデル → 運用 → 判断の順に並べています。一般的な設定と最も違うのは、3番目の層「自動で動くしくみ」（中核）です。</p>
       </div>
 
       <div class="detail-host" id="detail-host" aria-live="polite">
 
         <article class="layer-detail" id="layer-1" aria-labelledby="layer-1-h">
           <div class="ld-head"><img class="ld-illust" src="assets/illust/layer-1.webp" alt="層「静的設定」の挿絵" width="96" height="96" loading="lazy"><div><div class="ld-no">層 01</div><h3 id="layer-1-h">静的設定</h3><div class="ten">毎回読む土台・ルール</div></div></div>
-          <p>会話のたびに必ず読み込む土台です。実行してよい操作・委任の方針・モデルの使い分けをルールとして定義します。重い一覧は常時読み込まず、必要なときだけ読みます。</p>
+          <p>会話のたびに必ず読み込む土台です。実行してよい操作・委任の方針・モデルの使い分けをルールとして定義します。待機中の助っ人AI 101体のカタログのような件数の多い一覧は、常時は読み込まず、必要なときだけ読みます。</p>
           <ul class="chips"><li>CLAUDE.md（目次）</li><li class="key">AUTHORITY（判断基準）</li><li>委任ルール</li><li>モデル選択ルール</li><li>外部ワーカーの境界</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">CLAUDE.md</span></div>
@@ -709,7 +814,7 @@ p{margin:0;text-wrap:pretty}
 <span class="k">@</span>~/.claude/rules/subagent-delegation.md
 <span class="k">@</span>~/.claude/rules/model-routing.md
 <span class="c"># 待機101体のカタログは重いため @import せず、必要時に Read（オンデマンド）</span></code></pre>
-            <p class="why"><b>なぜ</b>：毎回読むものは、そのぶんコンテキストを消費します。重い一覧まで常時読み込むとコンテキストが圧迫されて参照の精度が落ちるため、必要なときだけ読み込みます。</p>
+            <p class="why"><b>なぜ</b>：毎回読むものは、そのぶんコンテキストを消費します。件数の多い一覧まで常時読み込むとコンテキストが圧迫され、ルールを正しく参照できなくなるため、必要なときだけ読み込みます。</p>
           </div>
           <a class="more" href="#fig-e"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図E フォルダ構成で、実際の置き場所を見る</a>
         </article>
@@ -754,14 +859,14 @@ p{margin:0;text-wrap:pretty}
   <span class="k">"PreCompact"</span>:   [{ "command": <span class="v">"~/.claude/hooks/pre-compact-sleep.sh"</span> }]
                                <span class="c">// 圧縮の直前に「睡眠」を促す</span>
 }</code></pre>
-            <p class="why"><b>なぜ</b>：これらはモデルの判断に依存せず、指定タイミングで<b>必ず実行されます</b>（決定論的）。確実に実行したい処理は、守られるかどうかがモデル次第になる自然言語の指示には書かず、ここに置いています。</p>
+            <p class="why"><b>なぜ</b>：フックはモデルの判断に依存せず、指定タイミングで<b>必ず実行されます</b>（決定論的）。確実に実行したい処理は、守られるかどうかがモデル次第になる自然言語の指示には書かず、フックに置いています。</p>
           </div>
           <a class="more" href="#fig-b"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図B 会話の流れで、フックが働く順番を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-4" aria-labelledby="layer-4-h">
           <div class="ld-head"><img class="ld-illust" src="assets/illust/layer-4.webp" alt="層「実行」の挿絵" width="96" height="96" loading="lazy"><div><div class="ld-no">層 04</div><h3 id="layer-4-h">実行</h3><div class="ten">作業を担う</div></div></div>
-          <p>実際の作業を担う層です。定型の手順を定めた「スキル」が72個、得意分野ごとの「助っ人AI」（サブエージェント）が起動可能な61体と待機中の101体あります。基本の14体と、いま主に使う技術に一致する専門AIは確認なしで起動し（緑）、それ以外は起動前に確認します（黄）。スキルには動画（Remotion 12スキル）・小説・TRPGログ・デザイン生成も含みます。</p>
+          <p>実際の作業を担う層です。定型の手順を定めた「スキル」が72個、得意分野ごとの「助っ人AI」（サブエージェント）が起動可能な61体と待機中の101体あります。役割ごとに決めた基本の14体（図C）と、いま主に使う技術に一致する専門AIは確認なしで起動し（緑）、それ以外は起動前に確認します（黄）。スキルには動画（Remotion 12スキル）・小説・TRPGログ・デザイン生成も含みます。</p>
           <ul class="chips"><li>スキル 72</li><li>助っ人AI 61</li><li>待機 101</li><li>役割の4階層</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例（サブエージェント委任）</h4><span class="fn">Agent()</span></div>
@@ -777,43 +882,43 @@ Agent(<span class="k">architect-reviewer</span>) ← "層構成の妥当性を�
 
         <article class="layer-detail" id="layer-5" aria-labelledby="layer-5-h">
           <div class="ld-head"><img class="ld-illust" src="assets/illust/layer-5.webp" alt="層「外部モデルワーカー」の挿絵" width="96" height="96" loading="lazy"><div><div class="ld-no">層 05</div><h3 id="layer-5-h">外部モデルワーカー</h3><div class="ten">別のモデルへ仕事を振る</div></div></div>
-          <p>Claude 以外のモデルを「ワーカー」として呼ぶ層です。ただし、ほとんどの作業は Claude の中（本流とサブエージェント）で完結しています。外へ出すのは主に2種類で、Codex には実装（GPT-5.6 Luna）と画像生成（GPT Image 2.5）を、Gemini には日本語の文章を任せます。ローカルの Qwen は機密を含む読み取り調査のために用意していますが、実際の出番は少なく、記録上は0回です。quasar・GLM・gemini-probe は検証のために接続しただけで、実運用では使っていません。</p>
+          <p>Claude 以外のモデルを「ワーカー」として呼ぶ層です。ただし、ほとんどの作業は Claude の中（本流とサブエージェント）で完結しています。外部に任せる先は主に Codex と Gemini の2つで、Codex には実装（GPT-5.6 Luna）と画像生成（GPT Image 2.5）を、Gemini には日本語の文章を任せます。ローカルの Qwen は機密を含む読み取り調査のために用意していますが、実際の出番は少なく、記録上は0回です。quasar・GLM・gemini-probe は検証のために接続しただけで、実運用では使っていません。</p>
           <ul class="chips"><li class="key">委任の大半は Claude 内</li><li class="key">Codex＝実装＋画像生成</li><li>Gemini＝日本語の文章</li><li>Qwen＝機密の調査用</li><li>検証用 3本</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">Agent() → 別モデル</span></div>
 <pre><code>Agent(<span class="k">luna-codex-worker</span>)     ← "このバグを直してテストを更新"         <span class="c">// 外部・区切られた実装</span>
 Agent(<span class="k">codex-image-worker</span>)    ← "透過背景のUIアイコンを1枚"           <span class="c">// 外部・GPT Image 2.5</span>
 Agent(<span class="k">gemini-worker</span>)         ← "この段落を自然な日本語に推敲"         <span class="c">// 外部・日本語の文章</span></code></pre>
-            <p class="why"><b>なぜ</b>：中量級の作業を別モデルに任せ、本流（最終判断を担うメインの Claude）の負荷を抑えます。<b>結果は「証拠」であって正しさの証明ではない</b>ため、どのモデルが実処理したかを報告に含め、確認していない検査を済んだことにしません。</p>
+            <p class="why"><b>なぜ</b>：範囲を区切れる中くらいの作業（バグ修正・画像1枚など）を別モデルに任せ、本流（最終判断を担うメインの Claude）の負荷を抑えます。<b>結果は「証拠」であって正しさの証明ではない</b>ため、どのモデルが実処理したかを報告に含め、確認していない検査を済んだことにしません。</p>
           </div>
           <a class="more" href="#fig-c"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図C 委任で、実際の振り先を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-6" aria-labelledby="layer-6-h">
           <div class="ld-head"><img class="ld-illust" src="assets/illust/layer-6.webp" alt="層「運用・自己点検」の挿絵" width="96" height="96" loading="lazy"><div><div class="ld-no">層 06</div><h3 id="layer-6-h">運用・自己点検</h3><div class="ten">健全性を保つ</div></div></div>
-          <p>「AIの仕組みは警告なく静かに壊れる」という課題への対策層です。作業を看板（タスクボード）で可視化し、成果物は2名体制でレビュー（重要な判断は全員一致まで）、月次で不要物を整理し、設定の健康診断・常時ロード量の測定・睡眠による記憶の書き出しを定期的に行います。</p>
-          <ul class="chips"><li>看板ボード</li><li>2名レビュー</li><li>健康診断</li><li>月次整理</li><li>睡眠</li><li class="key">判断ルールの監査</li></ul>
+          <p>「AIの仕組みは警告なく静かに壊れる」という課題への対策層です。作業を看板（タスクボード）で可視化し、成果物はレビュー用の AI 2体に並行して見せ（重要な判断は2体とも合格するまで）、月次で不要物を整理し、設定の健康診断・常時ロード量の測定・睡眠による記憶の書き出しを定期的に行います。</p>
+          <ul class="chips"><li>看板ボード</li><li>AI 2体のレビュー</li><li>健康診断</li><li>月次整理</li><li>睡眠</li><li class="key">判断ルールの監査</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">ops/board.md</span></div>
 <pre><code><span class="k">- [ ] [alert]</span> refs: CLAUDE.md スキル索引に design-creator 未記載
   重大度: <span class="v">WARN</span>
   冪等キー: refs:CLAUDE.md-skills-index:8f3ffa6a
   推奨対応: ## スキル に2行追記</code></pre>
-            <p class="why"><b>なぜ</b>：健康診断が見つけた不整合を看板へ自動登録します。上の例は、実際にこの仕組みが検出した索引漏れです。</p>
+            <p class="why"><b>なぜ</b>：健康診断が見つけた不整合を看板へ自動登録します。上の例は、実際に健康診断が検出した索引漏れです。</p>
           </div>
           <a class="more" href="#fig-d-audit"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図D で、判断のルールの監査（Jev）を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-7" aria-labelledby="layer-7-h">
           <div class="ld-head"><img class="ld-illust" src="assets/illust/layer-7.webp" alt="層「判断のルール」の挿絵" width="96" height="96" loading="lazy"><div><div class="ld-no">層 07</div><h3 id="layer-7-h">判断のルール</h3><div class="ten">自律の範囲を定める</div></div></div>
-          <p>全層に共通する責任の線引きです。AIが自ら決定してよい操作・人間に確認すべき操作・絶対に行わない操作を、信号機の色（緑／黄／赤）で区分します。「常に赤」とした操作は最初に判定し、フックがコードでも止めます。</p>
+          <p>全層に共通する線引きです。AIが自ら決定してよい操作・人間に確認すべき操作・絶対に行わない操作を、信号機の色（緑／黄／赤）で区分します。「常に赤」とした操作は最初に判定し、フックがコードでも止めます。</p>
           <ul class="chips"><li class="go">緑 実行可</li><li class="ask">黄 要確認</li><li class="stop">赤 禁止</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">AUTHORITY.md</span></div>
 <pre><code>git status / log / diff                  <span class="c">→</span> <span class="k">緑</span>（無確認）
 git commit / push（通常のブランチ）       <span class="c">→</span> <span class="k">黄</span>（確認）
 push --force to main ／ public への push <span class="c">→</span> <span class="k">赤</span>（禁止）</code></pre>
-            <p class="why"><b>なぜ</b>：色は、やり直せるか（可逆性）と影響が自分の作業範囲を超えるか（影響範囲）で決めます。やり直せない操作や影響の広い操作は、モデルが指示を守ることに期待せず、人間の確認を必須にするか実行しません。</p>
+            <p class="why"><b>なぜ</b>：色は、やり直せるか（可逆性）と影響が AI 自身の作業範囲を超えるか（影響範囲）で決めます。やり直せない操作や影響の広い操作は、モデルが指示を守ることに期待せず、人間の確認を必須にするか実行しません。</p>
           </div>
           <a class="more" href="#fig-d"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図D 判断のルールを見る</a>
         </article>
@@ -888,11 +993,11 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         </details>
       </li>
     </ol>
-    <p class="note">睡眠は、論文「Language Models Need Sleep」の考え方を運用の手順で近似したものです。手動の <span class="mono">/sleep</span> と、コンテキスト圧縮の直前に実行されるフック（直近の実行から5分以内なら何もせずに終了）の2つの入口から、同じ6手順を踏みます。フックは6種類のタイミングで計8本あり、上の図はそのうち主なものです。</p>
+    <p class="note">睡眠は、論文「Language Models Need Sleep」の考え方を運用の手順で近似したものです。手動の <span class="mono">/sleep</span> と、コンテキスト圧縮の直前に実行されるフック（直近の実行から5分以内なら何もせずに終了）の2つの入口から、同じ6手順を踏みます。フックは6種類のタイミングで計8本あり、上の図にはそのうち主な6本を載せています。</p>
 
     <div class="sub-block">
       <h3>モデルの使い分け（重さは難度で決める）</h3>
-      <p class="note">サブエージェントのモデルは、各定義ファイルの宣言（frontmatter）で決まり、これが唯一の既定です。呼び出し側で重いモデルに上げるのは「不可逆・共有物の設計判断」「事実の正確さが致命的」「判断軸が言語化できていない」の3条件のときだけで、軽いモデルに下げるのは自由です。処理する件数が多いことは、上げる理由になりません。下のバーは、起動可能な61体の割り当てです。</p>
+      <p class="note">サブエージェントのモデルは、各定義ファイルの宣言（frontmatter）で決まり、この宣言が唯一の既定です。呼び出し側で重いモデルに上げるのは「不可逆・共有物の設計判断」「事実の正確さが致命的」「判断軸が言語化できていない」の3条件のときだけで、軽いモデルに下げるのは自由です。処理する件数が多いことは、上げる理由になりません。下のバーは、起動可能な61体の割り当てです。</p>
       <div class="ratio" data-reveal>
         <div class="ratio-track" role="img" aria-label="起動可能な61体の既定モデル：sonnet 38体、haiku 13体、opus 6体、GPT-5.6 系 4体">
           <span class="ratio-seg s1" style="flex:38">sonnet 38</span><span class="ratio-seg s2" style="flex:13">haiku 13</span><span class="ratio-seg s3" style="flex:6">opus 6</span><span class="ratio-seg s4" style="flex:4"></span>
@@ -968,7 +1073,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         <div class="node center" data-node="main">
           <span class="nm">本流</span>
           <span class="sub">opus・最終判断</span>
-          <span class="nm-sm">曖昧な要件・安全に関わる作業・破壊的な判断はここに残す</span>
+          <span class="nm-sm">曖昧な要件・安全に関わる作業・破壊的な判断は本流に残す</span>
         </div>
       </div>
 
@@ -1079,15 +1184,15 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
     <div class="sub-block" id="fig-d-audit">
       <h3>ルール自体を監査する（Jev）</h3>
-      <p class="note">書いたルールが曖昧でないかを、TypeSafe の Jev（System One）に判定させて確かめています。ルールを渡して操作ごとに緑・黄・赤を選ばせ、自分の解釈と突き合わせます。作業中の判断には使わず、監査だけに使います。</p>
+      <p class="note">書いたルールが曖昧でないかを、TypeSafe の Jev（System One）に判定させて確かめています。ルールを渡して操作ごとに緑・黄・赤を選ばせ、ルールを書いた側の解釈と突き合わせます。作業中の判断には使わず、監査だけに使います。</p>
       <ol class="audit">
         <li><span class="step">段階1</span><h4>読解の確認</h4><p>表で答えが決まる22問を先に解かせる。ここで読み違えないことを確かめてから次へ進む。</p><div class="big"><div><b>22/22</b><small>正解</small></div></div></li>
-        <li><span class="step">段階2</span><h4>曖昧さの発見</h4><p>境界のケースを解かせ、自分の解釈とズレた問いと確信度の低い問いを「ルールの穴」の候補にする。</p></li>
+        <li><span class="step">段階2</span><h4>曖昧さの発見</h4><p>表だけでは答えが1つに決まらない問いを解かせ、書いた側の解釈とズレた問いと確信度の低い問いを「ルールの穴」の候補にする。</p></li>
         <li class="result"><span class="step">結果</span><h4>ルールに9項目を追加</h4><p>例：public への push を赤に。</p><div class="big"><div><b>4→0</b><small>ズレ</small></div><div><b>0.21→0.59</b><small>最低確信度</small></div><div><b>9</b><small>追加した項目</small></div></div></li>
       </ol>
     </div>
 
-    <p class="note">委任先の選び方も、緑・黄で決まります。基本の14体はカテゴリを問わず常に緑、専門AIは「現役スタック」に一致すれば緑、それ以外は黄です。<a href="#fig-c">図C の委任の階層へ戻る</a></p>
+    <p class="note">委任先の選び方も、緑・黄で決まります。基本の14体はカテゴリを問わず常に緑、専門AIは「現役スタック」（いま主に使う TypeScript・Next.js・Supabase など）に一致すれば緑、それ以外は黄です。<a href="#fig-c">図C の委任の階層へ戻る</a></p>
   </div>
 </section>
 
@@ -1153,7 +1258,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="fig-head">
       <p class="fig-no">一覧</p>
       <h2 id="lists-title">スキルと<wbr>助っ人AIの<wbr>一覧</h2>
-      <p class="lead">図に出てきたスキルと助っ人AIを、すべて一覧にしています。名前や説明で絞り込めます。</p>
+      <p class="lead">このシステムにあるスキル72個と助っ人AI（起動可61体・待機101体）を、すべて一覧にしています。名前や説明で絞り込めます。</p>
       <div class="sprite" style="--w:117;--h:206;--rows:87;--hw:112;--hdx:0;--hrows:87"><img src="assets/monet/pixel/monet-present.png" width="117" height="206" alt="こちらですと手で示すモネ（ドット絵）" loading="lazy"></div>
     </div>
 
@@ -1177,7 +1282,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="integrations">
       <div>
         <h3>外部連携（MCP）<span>5</span></h3>
-        <p class="note" style="margin-top:6px">MCP（Model Context Protocol）は、AIを外部のツールやデータに接続する仕組みです。いずれも claude.ai 経由のクラウド連携で、読み取りは確認不要、書き込み・更新系は「判断のルール」に従い確認のうえ実行します。</p>
+        <p class="note" style="margin-top:6px">MCP（Model Context Protocol）は、AIを外部のツールやデータに接続する仕組みです。下の5つはいずれも claude.ai 経由のクラウド連携で、読み取りは確認不要、書き込み・更新系は「判断のルール」に従い確認のうえ実行します。</p>
         <ul class="kv">
           <li><span class="nm">Claude Docs</span><span>文書の作成・編集を行う</span></li>
           <li><span class="nm">Canva</span><span>デザインの生成・編集・書き出しを行う</span></li>
@@ -1202,9 +1307,9 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
     <div class="sub-block">
       <h3>隣に置く資産ライブラリ</h3>
-      <p class="note" style="margin-top:6px">スキルが「具体値」を引くための、<span class="mono">~/.claude/</span> の外にあるデータ置き場です。</p>
+      <p class="note" style="margin-top:6px">スキルが配色・部品・動きの数値などの具体値を引くための、<span class="mono">~/.claude/</span> の外にあるデータ置き場です。</p>
       <div class="libs">
-        <div class="lib"><h3>design-library</h3><div class="ten">Web UI の世界観</div><p>配色（雰囲気別）・部品・CSS アニメの系統・タイポグラフィ・知識（色・アイコン・ロゴ・UI スタック）を持ちます。新規UIは、design-creator で意図を決め、ここで具体値を補強してから frontend-design で実装する、の3段で作ります。</p><ul class="chips"><li>colors</li><li>parts</li><li>animations</li><li>typography</li><li>knowledge</li></ul></div>
+        <div class="lib"><h3>design-library</h3><div class="ten">Web UI の世界観</div><p>配色（雰囲気別）・部品・CSS アニメの系統・タイポグラフィ・知識（色・アイコン・ロゴ・UI スタック）を持ちます。新規UIは、design-creator で意図を決め、design-library で具体値を補強してから frontend-design で実装する、の3段で作ります。</p><ul class="chips"><li>colors</li><li>parts</li><li>animations</li><li>typography</li><li>knowledge</li></ul></div>
         <div class="lib"><h3>video-library</h3><div class="ten">動画編集の部品と知識</div><p>テロップの型（169スタイル）・トランジション・実測した動きの数値・文字の出入りの部品（860部品）を、ブラウザで開けば見られる一覧（gallery）つきで持ちます。Remotion スキル群が素材として使います。</p><ul class="chips"><li>telop 169</li><li>kinetic 860</li><li>motion</li></ul></div>
         <div class="lib"><h3>doc-standards</h3><div class="ten">工程ドキュメントの粒度標準</div><p>要件・基本設計・詳細設計・テスト仕様と、アジャイル系（ユーザーストーリー・受入基準・Design Doc・ADR・RFC・PR-FAQ）のレシピと採点基準を置いています。doc-standard スキルが生成と逸脱チェックに使います。</p><ul class="chips"><li>waterfall</li><li>agile</li><li>rubric</li></ul></div>
       </div>
@@ -1391,6 +1496,58 @@ const io = new IntersectionObserver(entries => {
 io.observe(document.getElementById('stats'));
 document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
 
+/* ======================= 入場の動き ======================= */
+/**
+ * 入場させるまとまりと、その中で順に出す子。画面に入ったかの判定は JS、動きは CSS（.rv / .in）に分ける。
+ * 刻みは「全体 0.36s を要素数で割る」（yui540 の型）。ただし 1要素あたり 0.1s を上限にして、2〜3個のときに間延びさせない。
+ */
+const RV_GROUPS = [
+  ['.hero-top > div:first-child', ':scope > *', 0.2],
+  ['.fig-head', ':scope > *', 0],
+  ['.stack', ':scope > li', 0.3],
+  ['#stats', ':scope > .stat', 0],
+  ['.does', ':scope > div', 0],
+  ['.scenes', ':scope > li', 0],
+  ['.picker', ':scope > .pick', 0],
+  ['.graph', ':scope > .branch > *, :scope > .center-col, :scope .workers > *', 0],
+  ['.bounds', ':scope > li', 0],
+  ['.always-red', ':scope', 0],
+  ['.matrix', ':scope > .cell', 0.1],
+  ['.audit', ':scope > li', 0],
+  ['.tree', ':scope', 0],
+  ['.lists', ':scope > .list-panel', 0],
+  ['.integrations', ':scope > div', 0],
+  ['.libs', ':scope > .lib', 0],
+];
+if(!REDUCE){
+  const rvIO = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if(!en.isIntersecting) return;
+      en.target.querySelectorAll(':scope .rv, :scope.rv').forEach(el => el.classList.add('in'));
+      rvIO.unobserve(en.target);
+    });
+  }, {threshold:.12, rootMargin:'0px 0px -8% 0px'});
+  RV_GROUPS.forEach(([sel, childSel, base]) => document.querySelectorAll(sel).forEach(host => {
+    const items = [...host.querySelectorAll(childSel)];
+    const step = items.length > 1 ? Math.min(.1, .36 / (items.length - 1)) : 0;
+    items.forEach((el, i) => { el.classList.add('rv'); el.style.setProperty('--rv-d', (base + i * step).toFixed(3) + 's'); });
+    rvIO.observe(host);
+  }));
+  // 案内役：立ち絵がせり上がってから、吹き出しが遅れて弾む
+  const guideImg = document.querySelector('.guide img'), bubble = document.querySelector('.bubble');
+  guideImg.classList.add('rv'); guideImg.style.setProperty('--rv-d', '.3s');
+  bubble.classList.add('rv'); bubble.style.setProperty('--rv-d', '.85s');
+  requestAnimationFrame(() => { guideImg.classList.add('in'); bubble.classList.add('in'); });
+  // 層を貫く線：層のボタンが並ぶのに合わせて上から引き、線の左の短い棒は引き終わる頃に出す
+  const trace = document.getElementById('trace');
+  trace.classList.add('pre');
+  document.getElementById('trace-spine').classList.add('draw-in');
+  setTimeout(() => trace.classList.remove('pre'), 1150);
+  const brand = document.querySelector('.brand');
+  brand.querySelectorAll('.wm-ch').forEach((ch, i) => ch.style.setProperty('--i', i));
+  brand.classList.add('intro');
+}
+
 /* ======================= ヘッダーの現在地 ======================= */
 const navLinks = [...document.querySelectorAll('.site-nav a')];
 const navIO = new IntersectionObserver(entries => {
@@ -1531,7 +1688,7 @@ if(SHEET_MQ.matches) document.querySelectorAll('.tree details[data-sp-close]').f
 /* ======================= 一覧データ ======================= */
 const SKILLS=[
  {g:"デザイン・UI（6）",items:[["design-creator","ヒアリングを通じてデザイン仕様書（DESIGN.md）を作る"],["design-extractor","既存サイトのURLからデザイン情報を抽出する"],["design-generator","条件を指定して、デザイン仕様書をゼロから起こす"],["design-to-mock","デザイン仕様書からHTMLの試作ページを生成する"],["frontend-design","ありがちなAI生成の見た目を避けた、質の高いフロントエンドUIを作る"],["vercel-react-best-practices","React/Next.js の性能最適化ルールを適用する"]]},
- {g:"運用・自己管理・判断（10）",items:[["sleep","溜まった情報の要点を記憶と看板へ書き出す「睡眠」の手順（手動＋圧縮前の自動）"],["diet","月次で看板・記憶・成果物の不要物を整理し軽量化する"],["healthcheck","設定の不整合を検査し、問題を看板へ自動投入する"],["nightly","夜間自動ルーチンの設計管理（現状は設計のみ）"],["review-handoff","完成した成果物を2名体制で並行レビューにかける"],["santa-method","独立した2人のレビュアーが両方合格を出すまで完成としない敵対的レビュー"],["council","曖昧な意思決定について、4つの立場から異論を出させてから選ぶ"],["context-budget","常時読み込む要素のトークン消費を測定し、肥大を可視化する"],["architecture-decision-records","設計判断を文脈・代替案・却下理由つきで記録する（ADR）"],["pink-elephant-guard","却下した要素が完成稿へ再登場するのを防ぐ"]]},
+ {g:"運用・自己管理・判断（10）",items:[["sleep","溜まった情報の要点を記憶と看板へ書き出す「睡眠」の手順（手動＋圧縮前の自動）"],["diet","月次で看板・記憶・成果物の不要物を整理し軽量化する"],["healthcheck","設定の不整合を検査し、問題を看板へ自動投入する"],["nightly","夜間自動ルーチンの設計管理（現状は設計のみ）"],["review-handoff","完成した成果物を、レビュー用の AI 2体に並行して見せる"],["santa-method","独立した2体のレビュー用 AI が両方合格を出すまで完成としない、厳しめのレビュー"],["council","曖昧な意思決定について、4つの立場から異論を出させてから選ぶ"],["context-budget","常時読み込む要素のトークン消費を測定し、肥大を可視化する"],["architecture-decision-records","設計判断を文脈・代替案・却下理由つきで記録する（ADR）"],["pink-elephant-guard","却下した要素が完成稿へ再登場するのを防ぐ"]]},
  {g:"コード・文書・スキル作成（5）",items:[["coding-principles","命名・コメント・構造などコーディングの判断指針を適用する"],["doc-standard","工程ドキュメント19種の粒度標準に沿った生成と逸脱チェック"],["japanese-tech-writing","日本語の技術文書の構成と論証の規範"],["skill-creator-v2","新しいスキルの作成・既存スキルの改善と測定"],["find-skills","必要な機能のスキルを発見し、導入を補助する"]]},
  {g:"物語・キャラ・ログ（6）",items:[["novel-craft","小説の地の文・視点・セリフなど日本語散文の作法"],["character-persona-builder","キャラの人格を証拠ベースで分析し再利用できる形にする（ChatGPT と共有）"],["persona-loader","保存済みのペルソナを読み込んで適用する（ChatGPT と共有）"],["log-to-scenario","長い会話ログを過不足のない要約に変換する"],["trpg-session-to-page","TRPGの卓ログを、発言の帰属を厳密に分けてまとめ化する"],["discord-log-browser","ブラウザ経由でDiscordのログを抽出する（設計のみ）"]]},
  {g:"動画・Remotion（12）",items:[["remotion-best-practices","Remotion 系スキル全体への入口（ルーター）"],["remotion-create","Remotion プロジェクトの新規作成"],["remotion-captions","字幕の生成・表示"],["remotion-markup","演出の記述（マークアップ）"],["remotion-render","動画の書き出し"],["remotion-studio","Remotion Studio の操作"],["remotion-docs","Remotion 公式ドキュメントの参照"],["remotion-interactivity","インタラクティブな動画表現"],["remotion-maps","地図を使った動画表現"],["remotion-multimedia","音声・映像素材の扱い"],["remotion-saas","SaaS 向けの動画テンプレ"],["remotion-upgrade","Remotion のバージョン更新"]]},

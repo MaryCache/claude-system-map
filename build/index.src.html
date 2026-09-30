@@ -106,8 +106,8 @@ p{margin:0;text-wrap:pretty}
 }
 .site-head .bar{display:flex;align-items:center;gap:24px;height:var(--header-h)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
-.brand svg{width:30px;height:30px}
-.brand b{font-family:var(--font-sans);font-weight:600;font-size:17px;letter-spacing:-.01em}
+/* 文字ロゴの高さ。線の折れ（ディセンダーの下）まで含めた高さなので、字の大きさは本文の見出し程度になる */
+.brand svg{height:28px;width:auto;display:block;overflow:visible}
 .site-nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
 .site-nav::-webkit-scrollbar{display:none}
 .site-nav a{
@@ -600,6 +600,104 @@ p{margin:0;text-wrap:pretty}
 }
 @media (min-width:861px){ .sheet{display:none} }
 
+/* ================= 動き（入場） =================
+   数値は design-library/knowledge/motion/yui540.md の実測の型から取る：
+   長さ 700ms・ずらしは全体 0.36s を要素数で割る・不透明度は前半 20% で出し切る（型G）・
+   動かすのは transform と opacity だけ。.rv は JS が「動きを減らす」設定でないときだけ付ける＝
+   reduce の人と JS なしでは最初から最後の姿で出る。 */
+:root{
+  /* 署名的な強い ease-in-out。線・パネル・ワイプに使う */
+  --ease-io:cubic-bezier(.87,.05,.02,.97);
+  /* 初速の出る減速（わずかに行き過ぎる）。入場と、ホバーで浮かせる動きに使う */
+  --ease-snap:cubic-bezier(0,.56,.15,1.01);
+  /* 加速して去る。退場に使う */
+  --ease-exit:cubic-bezier(.74,.03,1,1);
+}
+.rv{opacity:0}
+.rv.in{animation:rv-rise .7s var(--ease-snap) var(--rv-d,0s) both}
+@keyframes rv-rise{0%{opacity:0;transform:translateY(18px)}20%{opacity:1}100%{opacity:1;transform:none}}
+/* 吹き出しは型A（行き過ぎて戻る）。支点は尾の付け根（右下） */
+.bubble.rv.in{animation-name:rv-pop;animation-duration:.6s;animation-timing-function:ease-in-out;transform-origin:85% 100%}
+@keyframes rv-pop{0%{opacity:0;transform:scale(.6)}15%{opacity:1}50%{transform:scale(1.06)}75%{transform:scale(.98)}100%{opacity:1;transform:none}}
+/* 案内役の立ち絵は下からせり上がる（マスクの縁から出てくる） */
+.guide img.rv.in{animation-name:rv-up;animation-duration:.8s}
+@keyframes rv-up{0%{opacity:0;transform:translateY(40px)}20%{opacity:1}100%{opacity:1;transform:none}}
+/* 層を貫く線は上から引く。層のボタンが並び終わる頃に下端へ着く */
+.trace .spine.draw-in{stroke-dasharray:100;animation:draw .9s var(--ease-io) .35s both}
+.trace .stub,.trace .elbow{transition:opacity .4s ease}
+/* 線の左の短い棒と、選んだ層から右へ出る折れは、縦の線が引き終わってから出す（先に見えると線が宙に浮く） */
+.trace.pre .stub,.trace.pre .elbow{opacity:0}
+/* ヘッダーの文字ロゴ：l の線が上から降り、字が1字ずつ浮かび、最後に線が右へ折れて単語の下を抜ける（型E：分割して連結）。
+   字のずらしは JS が --i を振る（15字 × 0.024s ≈ 全体 0.36s） */
+.brand #wm-spine,.brand #wm-elbow,.brand .wm-ch{transform-box:fill-box}
+.brand.intro #wm-spine{transform-origin:50% 0;animation:lg-spine .6s var(--ease-io) .1s both}
+.brand.intro .wm-ch{animation:lg-ch .6s var(--ease-snap) calc(.35s + var(--i,0) * .024s) both}
+.brand.intro #wm-elbow{transform-origin:0 50%;animation:lg-elbow .55s var(--ease-io) .8s both}
+@keyframes lg-ch{0%{opacity:0;transform:translateY(30%)}20%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes lg-spine{from{transform:scaleY(0)}}
+@keyframes lg-elbow{from{transform:scaleX(0)}}
+::view-transition-old(layer-detail){animation-duration:.24s;animation-timing-function:var(--ease-exit)}
+::view-transition-new(layer-detail){animation-duration:.34s;animation-timing-function:var(--ease-snap)}
+
+/* ================= 動き（ホバー・PC だけ） =================
+   マウスで指せる端末に限る（タッチでは :hover が押したあと残るため）。動きを減らす設定では付けない。
+   浮かせる量は 2〜6px に抑える：図の線（委任グラフ・層の線）が要素の縁につながっていて、大きく動かすと離れて見える。 */
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  /* 文字ロゴ：折れた線が少し先へ伸び、字がわずかに持ち上がる（線が字の下を通り抜けていく感じを足す）。
+     translateY は viewBox の単位（高さ 28px に 2535 単位）なので -60 で約 0.7px＝ごく小さく浮く */
+  .brand #wm-elbow{transition:transform .5s var(--ease-snap)}
+  .brand:hover #wm-elbow{transform:scaleX(1.05)}
+  .brand .wm-letters{transition:transform .5s var(--ease-snap)}
+  .brand:hover .wm-letters{transform:translateY(-60px)}
+
+  /* 案内役：少し身を乗り出し、吹き出しも追って揺れる */
+  .guide img{transform-origin:50% 100%;transition:transform .6s var(--ease-snap)}
+  .guide:hover img{transform:translateY(-6px) rotate(-1.5deg)}
+  .bubble{transition:transform .6s var(--ease-snap) .05s}
+  .guide:hover .bubble{transform:translateY(-3px) rotate(1deg)}
+
+  /* ドット絵のモネ：うなずきを2回（小さな合図は2回）。1ドット＝--s 画素の格子で動かし、にじませない */
+  .sprite:hover img{animation:nod .5s steps(1,end) 2}
+  @keyframes nod{0%{transform:none}25%{transform:translateY(calc(var(--s) * 2px))}60%{transform:translateY(calc(var(--s) * 1px))}85%{transform:none}}
+
+  /* 層のボタン：右へ寄り、挿絵が少し回って大きくなる */
+  .layer-btn{transition:border-color .2s ease,background-color .2s ease,transform .45s var(--ease-snap)}
+  .layer-btn:hover{transform:translateX(3px)}
+  .layer-btn .thumb{transition:transform .5s var(--ease-snap)}
+  .layer-btn:hover .thumb{transform:scale(1.14) rotate(-6deg)}
+  .layer-btn:hover .chev{transform:translateY(2px)}
+  .layer-btn[aria-pressed="true"]:hover .chev{transform:rotate(-90deg) translateY(-2px)}
+  /* 詳細パネルの挿絵：指しているあいだだけ呼吸する（周期 1.05s） */
+  .ld-illust{transition:transform .5s var(--ease-snap)}
+  .ld-head:hover .ld-illust{animation:breathe 1.05s ease-in-out infinite alternate}
+  @keyframes breathe{from{transform:translateY(0) rotate(0)}to{transform:translateY(-4px) rotate(-2deg)}}
+
+  /* カード類：少し浮いて枠が濃くなり、見出しのアイコンが傾く */
+  .scene,.audit li,.lib,.does > div,.node:not(.center),.cell,.integrations > div,.always-red{transition:transform .45s var(--ease-snap),border-color .2s ease,box-shadow .2s ease,filter .2s ease}
+  .scene:hover,.audit li:hover,.node:not(.center):not(.group):hover{transform:translateY(-3px);border-color:var(--line-strong)}
+  .lib:hover,.does > div:hover{transform:translateY(-3px)}
+  .cell:hover{transform:translateY(-2px)}
+  .scene h3 .icon,.does h3 .icon,.lib h3,.stat .num{transition:transform .5s var(--ease-snap)}
+  .scene:hover h3 .icon,.does > div:hover h3 .icon{transform:rotate(-10deg) scale(1.15)}
+  .lib:hover h3{transform:translateX(3px)}
+  .stat:hover .num{transform:translateY(-3px)}
+  .hooks li::before{transition:transform .4s var(--ease-snap)}
+  .hooks li:hover::before{transform:translateY(-1px) scale(1.6)}
+
+  /* 小さな操作部品 */
+  .pick,.filter,.lyr{transition:background-color .2s ease,color .2s ease,transform .4s var(--ease-snap)}
+  .pick:hover,.filter:hover{transform:translateY(-1px)}
+  .lyr:hover{transform:scale(1.06)}
+  .tree .row .nm{transition:transform .4s var(--ease-snap)}
+  .tree .row:hover .nm{transform:translateX(3px)}
+  .lgrp li .nm{transition:transform .4s var(--ease-snap)}
+  .lgrp li:hover .nm{transform:translateX(3px)}
+  .more .icon,.foot-links .icon,.gh-link .icon{transition:transform .4s var(--ease-snap)}
+  .more:hover .icon{transform:translate(2px,2px)}
+  .foot-links a:hover .icon{transform:translateX(-3px)}
+  .foot-links a[href^="http"]:hover .icon,.gh-link:hover .icon{transform:translate(2px,-2px)}
+}
+
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition-duration:0s!important;transition-delay:0s!important}
@@ -647,8 +745,7 @@ p{margin:0;text-wrap:pretty}
 <header class="site-head">
   <div class="wrap-wide bar">
     <a class="brand" href="#fig-a" aria-label="Claude System Map（ページの先頭へ）">
-      {{LOGO_SVG}}
-      <b>Claude System Map</b>
+      {{WORDMARK_SVG}}
     </a>
     <nav class="site-nav" aria-label="図へのジャンプ">
       <a href="#fig-a" data-nav="fig-a"><span class="tag">A</span>7つの層</a>
@@ -671,7 +768,7 @@ p{margin:0;text-wrap:pretty}
       <div>
         <p class="fig-no">図A　7つの層</p>
         <h1 id="fig-a-title">Claude Code を、7つの層で動かす</h1>
-        <p class="lead">個人で使っている Claude Code の構成図です。設定ファイルを置くだけでなく、会話をまたいで記憶を残し、区切りごとに記憶を整理し直し（この構成では「睡眠」と呼びます）、専門エージェントや外部モデルに仕事を振り分け、自分の設定を点検する仕組みを、7つの層に分けて組んでいます。層を選ぶと、その層の役割と実例が開きます。</p>
+        <p class="lead">個人で使っている Claude Code の構成図です。設定ファイルを置くだけでなく、会話をまたいで記憶を残し、区切りごとに記憶を整理し直し（この構成では「睡眠」と呼びます）、専門エージェントや外部モデルに仕事を振り分け、Claude Code 自身の設定を点検する仕組みを、7つの層に分けて組んでいます。層を選ぶと、その層の役割と実例が開きます。</p>
       </div>
       <div class="guide">
         <p class="bubble"><span class="phr">わかりやすく<wbr>説明できていたら<wbr>嬉しいな</span><small>──《案内役》モネ</small></p>
@@ -682,7 +779,7 @@ p{margin:0;text-wrap:pretty}
     <div class="stack-area">
       <div>
         <div class="stack-wrap" id="stack-wrap">
-          <svg class="trace" id="trace" aria-hidden="true"><g id="trace-stubs"></g><path class="spine" id="trace-spine" d=""/><path class="elbow" id="trace-elbow" d="" pathLength="100"/></svg>
+          <svg class="trace" id="trace" aria-hidden="true"><g id="trace-stubs"></g><path class="spine" id="trace-spine" d="" pathLength="100"/><path class="elbow" id="trace-elbow" d="" pathLength="100"/></svg>
           <ol class="stack" aria-label="7つの層（上が土台、下が判断）">
             <li><button class="layer-btn" type="button" data-layer="1" aria-pressed="false" aria-controls="layer-1"><span class="no">01</span><span><span class="nm">静的設定</span><span class="rl">毎回読み込む土台・ルール</span></span>{{ILLUST_NODE_1}}<svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
             <li><button class="layer-btn" type="button" data-layer="2" aria-pressed="false" aria-controls="layer-2"><span class="no">02</span><span><span class="nm">記憶</span><span class="rl">会話をまたいで覚える</span></span>{{ILLUST_NODE_2}}<svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
@@ -693,14 +790,14 @@ p{margin:0;text-wrap:pretty}
             <li><button class="layer-btn" type="button" data-layer="7" aria-pressed="false" aria-controls="layer-7"><span class="no">07</span><span><span class="nm">判断のルール</span><span class="rl">緑（実行可）／黄（要確認）／赤（禁止）</span></span>{{ILLUST_NODE_7}}<svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
           </ol>
         </div>
-        <p class="stack-caption">会話のたびに、この7つの層が連携して動きます。層は上から、土台 → 記憶 → 自動制御 → 実行 → 外部モデル → 運用 → 判断の順に並べています。一般的な設定と最も違うのは、3番目の層（中核）です。</p>
+        <p class="stack-caption">会話のたびに、この7つの層が連携して動きます。層は上から、土台 → 記憶 → 自動制御 → 実行 → 外部モデル → 運用 → 判断の順に並べています。一般的な設定と最も違うのは、3番目の層「自動で動くしくみ」（中核）です。</p>
       </div>
 
       <div class="detail-host" id="detail-host" aria-live="polite">
 
         <article class="layer-detail" id="layer-1" aria-labelledby="layer-1-h">
           <div class="ld-head">{{ILLUST_DETAIL_1}}<div><div class="ld-no">層 01</div><h3 id="layer-1-h">静的設定</h3><div class="ten">毎回読む土台・ルール</div></div></div>
-          <p>会話のたびに必ず読み込む土台です。実行してよい操作・委任の方針・モデルの使い分けをルールとして定義します。重い一覧は常時読み込まず、必要なときだけ読みます。</p>
+          <p>会話のたびに必ず読み込む土台です。実行してよい操作・委任の方針・モデルの使い分けをルールとして定義します。待機中の助っ人AI 101体のカタログのような件数の多い一覧は、常時は読み込まず、必要なときだけ読みます。</p>
           <ul class="chips"><li>CLAUDE.md（目次）</li><li class="key">AUTHORITY（判断基準）</li><li>委任ルール</li><li>モデル選択ルール</li><li>外部ワーカーの境界</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">CLAUDE.md</span></div>
@@ -709,7 +806,7 @@ p{margin:0;text-wrap:pretty}
 <span class="k">@</span>~/.claude/rules/subagent-delegation.md
 <span class="k">@</span>~/.claude/rules/model-routing.md
 <span class="c"># 待機101体のカタログは重いため @import せず、必要時に Read（オンデマンド）</span></code></pre>
-            <p class="why"><b>なぜ</b>：毎回読むものは、そのぶんコンテキストを消費します。重い一覧まで常時読み込むとコンテキストが圧迫されて参照の精度が落ちるため、必要なときだけ読み込みます。</p>
+            <p class="why"><b>なぜ</b>：毎回読むものは、そのぶんコンテキストを消費します。件数の多い一覧まで常時読み込むとコンテキストが圧迫され、ルールを正しく参照できなくなるため、必要なときだけ読み込みます。</p>
           </div>
           <a class="more" href="#fig-e"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図E フォルダ構成で、実際の置き場所を見る</a>
         </article>
@@ -754,14 +851,14 @@ p{margin:0;text-wrap:pretty}
   <span class="k">"PreCompact"</span>:   [{ "command": <span class="v">"~/.claude/hooks/pre-compact-sleep.sh"</span> }]
                                <span class="c">// 圧縮の直前に「睡眠」を促す</span>
 }</code></pre>
-            <p class="why"><b>なぜ</b>：これらはモデルの判断に依存せず、指定タイミングで<b>必ず実行されます</b>（決定論的）。確実に実行したい処理は、守られるかどうかがモデル次第になる自然言語の指示には書かず、ここに置いています。</p>
+            <p class="why"><b>なぜ</b>：フックはモデルの判断に依存せず、指定タイミングで<b>必ず実行されます</b>（決定論的）。確実に実行したい処理は、守られるかどうかがモデル次第になる自然言語の指示には書かず、フックに置いています。</p>
           </div>
           <a class="more" href="#fig-b"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図B 会話の流れで、フックが働く順番を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-4" aria-labelledby="layer-4-h">
           <div class="ld-head">{{ILLUST_DETAIL_4}}<div><div class="ld-no">層 04</div><h3 id="layer-4-h">実行</h3><div class="ten">作業を担う</div></div></div>
-          <p>実際の作業を担う層です。定型の手順を定めた「スキル」が72個、得意分野ごとの「助っ人AI」（サブエージェント）が起動可能な61体と待機中の101体あります。基本の14体と、いま主に使う技術に一致する専門AIは確認なしで起動し（緑）、それ以外は起動前に確認します（黄）。スキルには動画（Remotion 12スキル）・小説・TRPGログ・デザイン生成も含みます。</p>
+          <p>実際の作業を担う層です。定型の手順を定めた「スキル」が72個、得意分野ごとの「助っ人AI」（サブエージェント）が起動可能な61体と待機中の101体あります。役割ごとに決めた基本の14体（図C）と、いま主に使う技術に一致する専門AIは確認なしで起動し（緑）、それ以外は起動前に確認します（黄）。スキルには動画（Remotion 12スキル）・小説・TRPGログ・デザイン生成も含みます。</p>
           <ul class="chips"><li>スキル 72</li><li>助っ人AI 61</li><li>待機 101</li><li>役割の4階層</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例（サブエージェント委任）</h4><span class="fn">Agent()</span></div>
@@ -777,43 +874,43 @@ Agent(<span class="k">architect-reviewer</span>) ← "層構成の妥当性を�
 
         <article class="layer-detail" id="layer-5" aria-labelledby="layer-5-h">
           <div class="ld-head">{{ILLUST_DETAIL_5}}<div><div class="ld-no">層 05</div><h3 id="layer-5-h">外部モデルワーカー</h3><div class="ten">別のモデルへ仕事を振る</div></div></div>
-          <p>Claude 以外のモデルを「ワーカー」として呼ぶ層です。ただし、ほとんどの作業は Claude の中（本流とサブエージェント）で完結しています。外へ出すのは主に2種類で、Codex には実装（GPT-5.6 Luna）と画像生成（GPT Image 2.5）を、Gemini には日本語の文章を任せます。ローカルの Qwen は機密を含む読み取り調査のために用意していますが、実際の出番は少なく、記録上は0回です。quasar・GLM・gemini-probe は検証のために接続しただけで、実運用では使っていません。</p>
+          <p>Claude 以外のモデルを「ワーカー」として呼ぶ層です。ただし、ほとんどの作業は Claude の中（本流とサブエージェント）で完結しています。外部に任せる先は主に Codex と Gemini の2つで、Codex には実装（GPT-5.6 Luna）と画像生成（GPT Image 2.5）を、Gemini には日本語の文章を任せます。ローカルの Qwen は機密を含む読み取り調査のために用意していますが、実際の出番は少なく、記録上は0回です。quasar・GLM・gemini-probe は検証のために接続しただけで、実運用では使っていません。</p>
           <ul class="chips"><li class="key">委任の大半は Claude 内</li><li class="key">Codex＝実装＋画像生成</li><li>Gemini＝日本語の文章</li><li>Qwen＝機密の調査用</li><li>検証用 3本</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">Agent() → 別モデル</span></div>
 <pre><code>Agent(<span class="k">luna-codex-worker</span>)     ← "このバグを直してテストを更新"         <span class="c">// 外部・区切られた実装</span>
 Agent(<span class="k">codex-image-worker</span>)    ← "透過背景のUIアイコンを1枚"           <span class="c">// 外部・GPT Image 2.5</span>
 Agent(<span class="k">gemini-worker</span>)         ← "この段落を自然な日本語に推敲"         <span class="c">// 外部・日本語の文章</span></code></pre>
-            <p class="why"><b>なぜ</b>：中量級の作業を別モデルに任せ、本流（最終判断を担うメインの Claude）の負荷を抑えます。<b>結果は「証拠」であって正しさの証明ではない</b>ため、どのモデルが実処理したかを報告に含め、確認していない検査を済んだことにしません。</p>
+            <p class="why"><b>なぜ</b>：範囲を区切れる中くらいの作業（バグ修正・画像1枚など）を別モデルに任せ、本流（最終判断を担うメインの Claude）の負荷を抑えます。<b>結果は「証拠」であって正しさの証明ではない</b>ため、どのモデルが実処理したかを報告に含め、確認していない検査を済んだことにしません。</p>
           </div>
           <a class="more" href="#fig-c"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図C 委任で、実際の振り先を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-6" aria-labelledby="layer-6-h">
           <div class="ld-head">{{ILLUST_DETAIL_6}}<div><div class="ld-no">層 06</div><h3 id="layer-6-h">運用・自己点検</h3><div class="ten">健全性を保つ</div></div></div>
-          <p>「AIの仕組みは警告なく静かに壊れる」という課題への対策層です。作業を看板（タスクボード）で可視化し、成果物は2名体制でレビュー（重要な判断は全員一致まで）、月次で不要物を整理し、設定の健康診断・常時ロード量の測定・睡眠による記憶の書き出しを定期的に行います。</p>
-          <ul class="chips"><li>看板ボード</li><li>2名レビュー</li><li>健康診断</li><li>月次整理</li><li>睡眠</li><li class="key">判断ルールの監査</li></ul>
+          <p>「AIの仕組みは警告なく静かに壊れる」という課題への対策層です。作業を看板（タスクボード）で可視化し、成果物はレビュー用の AI 2体に並行して見せ（重要な判断は2体とも合格するまで）、月次で不要物を整理し、設定の健康診断・常時ロード量の測定・睡眠による記憶の書き出しを定期的に行います。</p>
+          <ul class="chips"><li>看板ボード</li><li>AI 2体のレビュー</li><li>健康診断</li><li>月次整理</li><li>睡眠</li><li class="key">判断ルールの監査</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">ops/board.md</span></div>
 <pre><code><span class="k">- [ ] [alert]</span> refs: CLAUDE.md スキル索引に design-creator 未記載
   重大度: <span class="v">WARN</span>
   冪等キー: refs:CLAUDE.md-skills-index:8f3ffa6a
   推奨対応: ## スキル に2行追記</code></pre>
-            <p class="why"><b>なぜ</b>：健康診断が見つけた不整合を看板へ自動登録します。上の例は、実際にこの仕組みが検出した索引漏れです。</p>
+            <p class="why"><b>なぜ</b>：健康診断が見つけた不整合を看板へ自動登録します。上の例は、実際に健康診断が検出した索引漏れです。</p>
           </div>
           <a class="more" href="#fig-d-audit"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図D で、判断のルールの監査（Jev）を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-7" aria-labelledby="layer-7-h">
           <div class="ld-head">{{ILLUST_DETAIL_7}}<div><div class="ld-no">層 07</div><h3 id="layer-7-h">判断のルール</h3><div class="ten">自律の範囲を定める</div></div></div>
-          <p>全層に共通する責任の線引きです。AIが自ら決定してよい操作・人間に確認すべき操作・絶対に行わない操作を、信号機の色（緑／黄／赤）で区分します。「常に赤」とした操作は最初に判定し、フックがコードでも止めます。</p>
+          <p>全層に共通する線引きです。AIが自ら決定してよい操作・人間に確認すべき操作・絶対に行わない操作を、信号機の色（緑／黄／赤）で区分します。「常に赤」とした操作は最初に判定し、フックがコードでも止めます。</p>
           <ul class="chips"><li class="go">緑 実行可</li><li class="ask">黄 要確認</li><li class="stop">赤 禁止</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">AUTHORITY.md</span></div>
 <pre><code>git status / log / diff                  <span class="c">→</span> <span class="k">緑</span>（無確認）
 git commit / push（通常のブランチ）       <span class="c">→</span> <span class="k">黄</span>（確認）
 push --force to main ／ public への push <span class="c">→</span> <span class="k">赤</span>（禁止）</code></pre>
-            <p class="why"><b>なぜ</b>：色は、やり直せるか（可逆性）と影響が自分の作業範囲を超えるか（影響範囲）で決めます。やり直せない操作や影響の広い操作は、モデルが指示を守ることに期待せず、人間の確認を必須にするか実行しません。</p>
+            <p class="why"><b>なぜ</b>：色は、やり直せるか（可逆性）と影響が AI 自身の作業範囲を超えるか（影響範囲）で決めます。やり直せない操作や影響の広い操作は、モデルが指示を守ることに期待せず、人間の確認を必須にするか実行しません。</p>
           </div>
           <a class="more" href="#fig-d"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図D 判断のルールを見る</a>
         </article>
@@ -888,11 +985,11 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         </details>
       </li>
     </ol>
-    <p class="note">睡眠は、論文「Language Models Need Sleep」の考え方を運用の手順で近似したものです。手動の <span class="mono">/sleep</span> と、コンテキスト圧縮の直前に実行されるフック（直近の実行から5分以内なら何もせずに終了）の2つの入口から、同じ6手順を踏みます。フックは6種類のタイミングで計8本あり、上の図はそのうち主なものです。</p>
+    <p class="note">睡眠は、論文「Language Models Need Sleep」の考え方を運用の手順で近似したものです。手動の <span class="mono">/sleep</span> と、コンテキスト圧縮の直前に実行されるフック（直近の実行から5分以内なら何もせずに終了）の2つの入口から、同じ6手順を踏みます。フックは6種類のタイミングで計8本あり、上の図にはそのうち主な6本を載せています。</p>
 
     <div class="sub-block">
       <h3>モデルの使い分け（重さは難度で決める）</h3>
-      <p class="note">サブエージェントのモデルは、各定義ファイルの宣言（frontmatter）で決まり、これが唯一の既定です。呼び出し側で重いモデルに上げるのは「不可逆・共有物の設計判断」「事実の正確さが致命的」「判断軸が言語化できていない」の3条件のときだけで、軽いモデルに下げるのは自由です。処理する件数が多いことは、上げる理由になりません。下のバーは、起動可能な61体の割り当てです。</p>
+      <p class="note">サブエージェントのモデルは、各定義ファイルの宣言（frontmatter）で決まり、この宣言が唯一の既定です。呼び出し側で重いモデルに上げるのは「不可逆・共有物の設計判断」「事実の正確さが致命的」「判断軸が言語化できていない」の3条件のときだけで、軽いモデルに下げるのは自由です。処理する件数が多いことは、上げる理由になりません。下のバーは、起動可能な61体の割り当てです。</p>
       <div class="ratio" data-reveal>
         <div class="ratio-track" role="img" aria-label="起動可能な61体の既定モデル：sonnet 38体、haiku 13体、opus 6体、GPT-5.6 系 4体">
           <span class="ratio-seg s1" style="flex:38">sonnet 38</span><span class="ratio-seg s2" style="flex:13">haiku 13</span><span class="ratio-seg s3" style="flex:6">opus 6</span><span class="ratio-seg s4" style="flex:4"></span>
@@ -968,7 +1065,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         <div class="node center" data-node="main">
           <span class="nm">本流</span>
           <span class="sub">opus・最終判断</span>
-          <span class="nm-sm">曖昧な要件・安全に関わる作業・破壊的な判断はここに残す</span>
+          <span class="nm-sm">曖昧な要件・安全に関わる作業・破壊的な判断は本流に残す</span>
         </div>
       </div>
 
@@ -1079,15 +1176,15 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
     <div class="sub-block" id="fig-d-audit">
       <h3>ルール自体を監査する（Jev）</h3>
-      <p class="note">書いたルールが曖昧でないかを、TypeSafe の Jev（System One）に判定させて確かめています。ルールを渡して操作ごとに緑・黄・赤を選ばせ、自分の解釈と突き合わせます。作業中の判断には使わず、監査だけに使います。</p>
+      <p class="note">書いたルールが曖昧でないかを、TypeSafe の Jev（System One）に判定させて確かめています。ルールを渡して操作ごとに緑・黄・赤を選ばせ、ルールを書いた側の解釈と突き合わせます。作業中の判断には使わず、監査だけに使います。</p>
       <ol class="audit">
         <li><span class="step">段階1</span><h4>読解の確認</h4><p>表で答えが決まる22問を先に解かせる。ここで読み違えないことを確かめてから次へ進む。</p><div class="big"><div><b>22/22</b><small>正解</small></div></div></li>
-        <li><span class="step">段階2</span><h4>曖昧さの発見</h4><p>境界のケースを解かせ、自分の解釈とズレた問いと確信度の低い問いを「ルールの穴」の候補にする。</p></li>
+        <li><span class="step">段階2</span><h4>曖昧さの発見</h4><p>表だけでは答えが1つに決まらない問いを解かせ、書いた側の解釈とズレた問いと確信度の低い問いを「ルールの穴」の候補にする。</p></li>
         <li class="result"><span class="step">結果</span><h4>ルールに9項目を追加</h4><p>例：public への push を赤に。</p><div class="big"><div><b>4→0</b><small>ズレ</small></div><div><b>0.21→0.59</b><small>最低確信度</small></div><div><b>9</b><small>追加した項目</small></div></div></li>
       </ol>
     </div>
 
-    <p class="note">委任先の選び方も、緑・黄で決まります。基本の14体はカテゴリを問わず常に緑、専門AIは「現役スタック」に一致すれば緑、それ以外は黄です。<a href="#fig-c">図C の委任の階層へ戻る</a></p>
+    <p class="note">委任先の選び方も、緑・黄で決まります。基本の14体はカテゴリを問わず常に緑、専門AIは「現役スタック」（いま主に使う TypeScript・Next.js・Supabase など）に一致すれば緑、それ以外は黄です。<a href="#fig-c">図C の委任の階層へ戻る</a></p>
   </div>
 </section>
 
@@ -1153,7 +1250,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="fig-head">
       <p class="fig-no">一覧</p>
       <h2 id="lists-title">スキルと<wbr>助っ人AIの<wbr>一覧</h2>
-      <p class="lead">図に出てきたスキルと助っ人AIを、すべて一覧にしています。名前や説明で絞り込めます。</p>
+      <p class="lead">このシステムにあるスキル72個と助っ人AI（起動可61体・待機101体）を、すべて一覧にしています。名前や説明で絞り込めます。</p>
 {{MONET lists}}
     </div>
 
@@ -1177,7 +1274,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="integrations">
       <div>
         <h3>外部連携（MCP）<span>5</span></h3>
-        <p class="note" style="margin-top:6px">MCP（Model Context Protocol）は、AIを外部のツールやデータに接続する仕組みです。いずれも claude.ai 経由のクラウド連携で、読み取りは確認不要、書き込み・更新系は「判断のルール」に従い確認のうえ実行します。</p>
+        <p class="note" style="margin-top:6px">MCP（Model Context Protocol）は、AIを外部のツールやデータに接続する仕組みです。下の5つはいずれも claude.ai 経由のクラウド連携で、読み取りは確認不要、書き込み・更新系は「判断のルール」に従い確認のうえ実行します。</p>
         <ul class="kv">
           <li><span class="nm">Claude Docs</span><span>文書の作成・編集を行う</span></li>
           <li><span class="nm">Canva</span><span>デザインの生成・編集・書き出しを行う</span></li>
@@ -1202,9 +1299,9 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
     <div class="sub-block">
       <h3>隣に置く資産ライブラリ</h3>
-      <p class="note" style="margin-top:6px">スキルが「具体値」を引くための、<span class="mono">~/.claude/</span> の外にあるデータ置き場です。</p>
+      <p class="note" style="margin-top:6px">スキルが配色・部品・動きの数値などの具体値を引くための、<span class="mono">~/.claude/</span> の外にあるデータ置き場です。</p>
       <div class="libs">
-        <div class="lib"><h3>design-library</h3><div class="ten">Web UI の世界観</div><p>配色（雰囲気別）・部品・CSS アニメの系統・タイポグラフィ・知識（色・アイコン・ロゴ・UI スタック）を持ちます。新規UIは、design-creator で意図を決め、ここで具体値を補強してから frontend-design で実装する、の3段で作ります。</p><ul class="chips"><li>colors</li><li>parts</li><li>animations</li><li>typography</li><li>knowledge</li></ul></div>
+        <div class="lib"><h3>design-library</h3><div class="ten">Web UI の世界観</div><p>配色（雰囲気別）・部品・CSS アニメの系統・タイポグラフィ・知識（色・アイコン・ロゴ・UI スタック）を持ちます。新規UIは、design-creator で意図を決め、design-library で具体値を補強してから frontend-design で実装する、の3段で作ります。</p><ul class="chips"><li>colors</li><li>parts</li><li>animations</li><li>typography</li><li>knowledge</li></ul></div>
         <div class="lib"><h3>video-library</h3><div class="ten">動画編集の部品と知識</div><p>テロップの型（169スタイル）・トランジション・実測した動きの数値・文字の出入りの部品（860部品）を、ブラウザで開けば見られる一覧（gallery）つきで持ちます。Remotion スキル群が素材として使います。</p><ul class="chips"><li>telop 169</li><li>kinetic 860</li><li>motion</li></ul></div>
         <div class="lib"><h3>doc-standards</h3><div class="ten">工程ドキュメントの粒度標準</div><p>要件・基本設計・詳細設計・テスト仕様と、アジャイル系（ユーザーストーリー・受入基準・Design Doc・ADR・RFC・PR-FAQ）のレシピと採点基準を置いています。doc-standard スキルが生成と逸脱チェックに使います。</p><ul class="chips"><li>waterfall</li><li>agile</li><li>rubric</li></ul></div>
       </div>
@@ -1391,6 +1488,58 @@ const io = new IntersectionObserver(entries => {
 io.observe(document.getElementById('stats'));
 document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
 
+/* ======================= 入場の動き ======================= */
+/**
+ * 入場させるまとまりと、その中で順に出す子。画面に入ったかの判定は JS、動きは CSS（.rv / .in）に分ける。
+ * 刻みは「全体 0.36s を要素数で割る」（yui540 の型）。ただし 1要素あたり 0.1s を上限にして、2〜3個のときに間延びさせない。
+ */
+const RV_GROUPS = [
+  ['.hero-top > div:first-child', ':scope > *', 0.2],
+  ['.fig-head', ':scope > *', 0],
+  ['.stack', ':scope > li', 0.3],
+  ['#stats', ':scope > .stat', 0],
+  ['.does', ':scope > div', 0],
+  ['.scenes', ':scope > li', 0],
+  ['.picker', ':scope > .pick', 0],
+  ['.graph', ':scope > .branch > *, :scope > .center-col, :scope .workers > *', 0],
+  ['.bounds', ':scope > li', 0],
+  ['.always-red', ':scope', 0],
+  ['.matrix', ':scope > .cell', 0.1],
+  ['.audit', ':scope > li', 0],
+  ['.tree', ':scope', 0],
+  ['.lists', ':scope > .list-panel', 0],
+  ['.integrations', ':scope > div', 0],
+  ['.libs', ':scope > .lib', 0],
+];
+if(!REDUCE){
+  const rvIO = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if(!en.isIntersecting) return;
+      en.target.querySelectorAll(':scope .rv, :scope.rv').forEach(el => el.classList.add('in'));
+      rvIO.unobserve(en.target);
+    });
+  }, {threshold:.12, rootMargin:'0px 0px -8% 0px'});
+  RV_GROUPS.forEach(([sel, childSel, base]) => document.querySelectorAll(sel).forEach(host => {
+    const items = [...host.querySelectorAll(childSel)];
+    const step = items.length > 1 ? Math.min(.1, .36 / (items.length - 1)) : 0;
+    items.forEach((el, i) => { el.classList.add('rv'); el.style.setProperty('--rv-d', (base + i * step).toFixed(3) + 's'); });
+    rvIO.observe(host);
+  }));
+  // 案内役：立ち絵がせり上がってから、吹き出しが遅れて弾む
+  const guideImg = document.querySelector('.guide img'), bubble = document.querySelector('.bubble');
+  guideImg.classList.add('rv'); guideImg.style.setProperty('--rv-d', '.3s');
+  bubble.classList.add('rv'); bubble.style.setProperty('--rv-d', '.85s');
+  requestAnimationFrame(() => { guideImg.classList.add('in'); bubble.classList.add('in'); });
+  // 層を貫く線：層のボタンが並ぶのに合わせて上から引き、線の左の短い棒は引き終わる頃に出す
+  const trace = document.getElementById('trace');
+  trace.classList.add('pre');
+  document.getElementById('trace-spine').classList.add('draw-in');
+  setTimeout(() => trace.classList.remove('pre'), 1150);
+  const brand = document.querySelector('.brand');
+  brand.querySelectorAll('.wm-ch').forEach((ch, i) => ch.style.setProperty('--i', i));
+  brand.classList.add('intro');
+}
+
 /* ======================= ヘッダーの現在地 ======================= */
 const navLinks = [...document.querySelectorAll('.site-nav a')];
 const navIO = new IntersectionObserver(entries => {
@@ -1531,7 +1680,7 @@ if(SHEET_MQ.matches) document.querySelectorAll('.tree details[data-sp-close]').f
 /* ======================= 一覧データ ======================= */
 const SKILLS=[
  {g:"デザイン・UI（6）",items:[["design-creator","ヒアリングを通じてデザイン仕様書（DESIGN.md）を作る"],["design-extractor","既存サイトのURLからデザイン情報を抽出する"],["design-generator","条件を指定して、デザイン仕様書をゼロから起こす"],["design-to-mock","デザイン仕様書からHTMLの試作ページを生成する"],["frontend-design","ありがちなAI生成の見た目を避けた、質の高いフロントエンドUIを作る"],["vercel-react-best-practices","React/Next.js の性能最適化ルールを適用する"]]},
- {g:"運用・自己管理・判断（10）",items:[["sleep","溜まった情報の要点を記憶と看板へ書き出す「睡眠」の手順（手動＋圧縮前の自動）"],["diet","月次で看板・記憶・成果物の不要物を整理し軽量化する"],["healthcheck","設定の不整合を検査し、問題を看板へ自動投入する"],["nightly","夜間自動ルーチンの設計管理（現状は設計のみ）"],["review-handoff","完成した成果物を2名体制で並行レビューにかける"],["santa-method","独立した2人のレビュアーが両方合格を出すまで完成としない敵対的レビュー"],["council","曖昧な意思決定について、4つの立場から異論を出させてから選ぶ"],["context-budget","常時読み込む要素のトークン消費を測定し、肥大を可視化する"],["architecture-decision-records","設計判断を文脈・代替案・却下理由つきで記録する（ADR）"],["pink-elephant-guard","却下した要素が完成稿へ再登場するのを防ぐ"]]},
+ {g:"運用・自己管理・判断（10）",items:[["sleep","溜まった情報の要点を記憶と看板へ書き出す「睡眠」の手順（手動＋圧縮前の自動）"],["diet","月次で看板・記憶・成果物の不要物を整理し軽量化する"],["healthcheck","設定の不整合を検査し、問題を看板へ自動投入する"],["nightly","夜間自動ルーチンの設計管理（現状は設計のみ）"],["review-handoff","完成した成果物を、レビュー用の AI 2体に並行して見せる"],["santa-method","独立した2体のレビュー用 AI が両方合格を出すまで完成としない、厳しめのレビュー"],["council","曖昧な意思決定について、4つの立場から異論を出させてから選ぶ"],["context-budget","常時読み込む要素のトークン消費を測定し、肥大を可視化する"],["architecture-decision-records","設計判断を文脈・代替案・却下理由つきで記録する（ADR）"],["pink-elephant-guard","却下した要素が完成稿へ再登場するのを防ぐ"]]},
  {g:"コード・文書・スキル作成（5）",items:[["coding-principles","命名・コメント・構造などコーディングの判断指針を適用する"],["doc-standard","工程ドキュメント19種の粒度標準に沿った生成と逸脱チェック"],["japanese-tech-writing","日本語の技術文書の構成と論証の規範"],["skill-creator-v2","新しいスキルの作成・既存スキルの改善と測定"],["find-skills","必要な機能のスキルを発見し、導入を補助する"]]},
  {g:"物語・キャラ・ログ（6）",items:[["novel-craft","小説の地の文・視点・セリフなど日本語散文の作法"],["character-persona-builder","キャラの人格を証拠ベースで分析し再利用できる形にする（ChatGPT と共有）"],["persona-loader","保存済みのペルソナを読み込んで適用する（ChatGPT と共有）"],["log-to-scenario","長い会話ログを過不足のない要約に変換する"],["trpg-session-to-page","TRPGの卓ログを、発言の帰属を厳密に分けてまとめ化する"],["discord-log-browser","ブラウザ経由でDiscordのログを抽出する（設計のみ）"]]},
  {g:"動画・Remotion（12）",items:[["remotion-best-practices","Remotion 系スキル全体への入口（ルーター）"],["remotion-create","Remotion プロジェクトの新規作成"],["remotion-captions","字幕の生成・表示"],["remotion-markup","演出の記述（マークアップ）"],["remotion-render","動画の書き出し"],["remotion-studio","Remotion Studio の操作"],["remotion-docs","Remotion 公式ドキュメントの参照"],["remotion-interactivity","インタラクティブな動画表現"],["remotion-maps","地図を使った動画表現"],["remotion-multimedia","音声・映像素材の扱い"],["remotion-saas","SaaS 向けの動画テンプレ"],["remotion-upgrade","Remotion のバージョン更新"]]},
