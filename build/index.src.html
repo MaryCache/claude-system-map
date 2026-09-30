@@ -605,6 +605,8 @@ p{margin:0;text-wrap:pretty}
   .layer-btn,.node,.cell,.scene,.detail-host{border-color:CanvasText}
   .trace .spine,.trace .elbow,.graph-lines .hot{stroke:Highlight}
 }
+/* 吹き出しのセリフは文節の切れ目でだけ折る（「説明でき／ていたら」と割れた） */
+.bubble .phr{word-break:keep-all;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -665,7 +667,7 @@ p{margin:0;text-wrap:pretty}
         <p class="lead">個人で使っている Claude Code の構成図です。設定ファイルを置くだけでなく、会話をまたいで記憶を残し、区切りごとに記憶を整理し直し（この構成では「睡眠」と呼びます）、専門エージェントや外部モデルに仕事を振り分け、自分の設定を点検する仕組みを、7つの層に分けて組んでいます。層を選ぶと、その層の役割と実例が開きます。</p>
       </div>
       <div class="guide">
-        <p class="bubble">わかりやすく、一緒に見ていきましょう。<small>案内役のモネです</small></p>
+        <p class="bubble"><span class="phr">わかりやすく<wbr>説明できていたら<wbr>嬉しいな</span><small>──《案内役》モネ</small></p>
         <img src="assets/monet/cut/pose-guide.webp" width="330" height="275" alt="案内役のモネ。左の図を手で示している">
       </div>
     </div>
