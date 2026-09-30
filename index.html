@@ -351,8 +351,10 @@ p{margin:0;text-wrap:pretty}
 .worker .t{font-size:11.5px;padding:0 7px;border-radius:999px;border:1px solid var(--line);line-height:1.7}
 .worker .t.ext{border-color:var(--line-strong)}
 .worker .t.local{background:var(--surface-2)}
-.worker.off{border-style:dashed;background:transparent}
-.worker.off .nm{text-decoration:line-through;text-decoration-color:var(--ink-dim)}
+.group.trial{background:var(--surface-1)}
+.group.trial > .group-title{color:var(--ink-dim);font-weight:500}
+.group.trial .worker{background:transparent;border-style:dashed}
+.group.trial .worker .nm{color:var(--ink-dim)}
 .speed{display:grid;grid-template-columns:auto;justify-items:end;font-family:var(--font-mono);font-size:12px;color:var(--ink-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
 .speed .meter{width:90px;height:6px;border-radius:3px;background:var(--surface-2);position:relative;margin-top:3px}
 .speed .meter i{position:absolute;top:0;bottom:0;border-radius:3px;background:var(--ink)}
@@ -562,6 +564,9 @@ p{margin:0;text-wrap:pretty}
   /* SP では顔の周りだけの窓にして、見出しの幅を残す */
   .fig-head .lead{grid-column:1 / -1}
   .fig-head .avatar,.fig-head .sprite{grid-row:1 / span 2}
+  /* スマホの見出しのモネは 4/3 倍。2倍だと見出しの列が狭くなり「フォルダ構／成」と割れた。
+     DPR 3 の端末（iPhone など）では 1ドット＝ちょうど4画素になり、ぼけない */
+  .fig-head .sprite{--s:1.3334}
   .fig-head .sprite{width:calc(var(--hw) * var(--s) * 1px);height:calc(var(--hrows) * var(--s) * 1px)}
   .fig-head .sprite img{margin-left:calc(var(--hdx) * var(--s) * -1px)}
   .always-red{grid-template-columns:1fr}
@@ -607,6 +612,8 @@ p{margin:0;text-wrap:pretty}
 }
 /* 吹き出しのセリフは文節の切れ目でだけ折る（「説明でき／ていたら」と割れた） */
 .bubble .phr{word-break:keep-all;overflow-wrap:anywhere}
+/* 図の見出しは文節の切れ目（wbr）でだけ折る（スマホで「実／際」「助っ／人AI」と割れた） */
+.fig-head h2{word-break:keep-all;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -681,7 +688,7 @@ p{margin:0;text-wrap:pretty}
             <li><button class="layer-btn" type="button" data-layer="2" aria-pressed="false" aria-controls="layer-2"><span class="no">02</span><span><span class="nm">記憶</span><span class="rl">会話をまたいで覚える</span></span><img class="thumb" src="assets/illust/layer-2.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
             <li><button class="layer-btn core" type="button" data-layer="3" aria-pressed="false" aria-controls="layer-3"><span class="no">03</span><span><span class="nm">自動で動くしくみ</span><span class="rl">フックによる注入・機械的な安全装置・睡眠</span></span><span class="tag">中核</span><img class="thumb" src="assets/illust/layer-3.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
             <li><button class="layer-btn" type="button" data-layer="4" aria-pressed="false" aria-controls="layer-4"><span class="no">04</span><span><span class="nm">実行</span><span class="rl">スキルと助っ人AIで作業する</span></span><img class="thumb" src="assets/illust/layer-4.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
-            <li><button class="layer-btn" type="button" data-layer="5" aria-pressed="false" aria-controls="layer-5"><span class="no">05</span><span><span class="nm">外部モデルワーカー</span><span class="rl">Codex・Gemini・ローカル Qwen などに仕事を振る</span></span><span class="tag">新層</span><img class="thumb" src="assets/illust/layer-5.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
+            <li><button class="layer-btn" type="button" data-layer="5" aria-pressed="false" aria-controls="layer-5"><span class="no">05</span><span><span class="nm">外部モデルワーカー</span><span class="rl">実装と画像は Codex、日本語の文章は Gemini に振る</span></span><img class="thumb" src="assets/illust/layer-5.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
             <li><button class="layer-btn" type="button" data-layer="6" aria-pressed="false" aria-controls="layer-6"><span class="no">06</span><span><span class="nm">運用・自己点検</span><span class="rl">看板・レビュー・健康診断・整理</span></span><img class="thumb" src="assets/illust/layer-6.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
             <li><button class="layer-btn" type="button" data-layer="7" aria-pressed="false" aria-controls="layer-7"><span class="no">07</span><span><span class="nm">判断のルール</span><span class="rl">緑（実行可）／黄（要確認）／赤（禁止）</span></span><img class="thumb" src="assets/illust/layer-7.webp" alt="" width="40" height="40" loading="lazy"><svg class="icon chev" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></li>
           </ol>
@@ -754,8 +761,8 @@ p{margin:0;text-wrap:pretty}
 
         <article class="layer-detail" id="layer-4" aria-labelledby="layer-4-h">
           <div class="ld-head"><img class="ld-illust" src="assets/illust/layer-4.webp" alt="層「実行」の挿絵" width="96" height="96" loading="lazy"><div><div class="ld-no">層 04</div><h3 id="layer-4-h">実行</h3><div class="ten">作業を担う</div></div></div>
-          <p>実際の作業を担う層です。定型の手順を定めた「スキル」が72個、得意分野ごとの「助っ人AI」（サブエージェント）が起動可能な62体と待機中の101体あります。基本の14体と、いま主に使う技術に一致する専門AIは確認なしで起動し（緑）、それ以外は起動前に確認します（黄）。スキルには動画（Remotion 12スキル）・小説・TRPGログ・デザイン生成も含みます。</p>
-          <ul class="chips"><li>スキル 72</li><li>助っ人AI 62</li><li>待機 101</li><li>役割の4階層</li></ul>
+          <p>実際の作業を担う層です。定型の手順を定めた「スキル」が72個、得意分野ごとの「助っ人AI」（サブエージェント）が起動可能な61体と待機中の101体あります。基本の14体と、いま主に使う技術に一致する専門AIは確認なしで起動し（緑）、それ以外は起動前に確認します（黄）。スキルには動画（Remotion 12スキル）・小説・TRPGログ・デザイン生成も含みます。</p>
+          <ul class="chips"><li>スキル 72</li><li>助っ人AI 61</li><li>待機 101</li><li>役割の4階層</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例（サブエージェント委任）</h4><span class="fn">Agent()</span></div>
 <pre><code><span class="c">// コード変更後、独立した文脈で2観点を並列レビュー</span>
@@ -769,18 +776,17 @@ Agent(<span class="k">architect-reviewer</span>) ← "層構成の妥当性を�
         </article>
 
         <article class="layer-detail" id="layer-5" aria-labelledby="layer-5-h">
-          <div class="ld-head"><img class="ld-illust" src="assets/illust/layer-5.webp" alt="層「外部モデルワーカー」の挿絵" width="96" height="96" loading="lazy"><div><div class="ld-no">層 05・新層</div><h3 id="layer-5-h">外部モデルワーカー</h3><div class="ten">別のモデルへ仕事を振る</div></div></div>
-          <p>Claude 以外のモデルを「ワーカー」として呼ぶ層です。Codex には実装（GPT-5.6 Luna）と画像生成（GPT Image 2.5）を、読み取り調査にはローカルの Qwen3.8 27B を、文章生成と急ぎの調査には Gemini を、段階的な分析には GLM などを割り当てています。ローカルか外部か、速いか遅いかで使い分け、機密を含む調査はローカルに限ります。</p>
-          <ul class="chips"><li class="key">ワーカー 7</li><li>ローカル 1</li><li>外部 6</li><li class="key">Codex＝実装＋画像生成</li><li>停止中 1本を除く</li></ul>
+          <div class="ld-head"><img class="ld-illust" src="assets/illust/layer-5.webp" alt="層「外部モデルワーカー」の挿絵" width="96" height="96" loading="lazy"><div><div class="ld-no">層 05</div><h3 id="layer-5-h">外部モデルワーカー</h3><div class="ten">別のモデルへ仕事を振る</div></div></div>
+          <p>Claude 以外のモデルを「ワーカー」として呼ぶ層です。ただし、ほとんどの作業は Claude の中（本流とサブエージェント）で完結しています。外へ出すのは主に2種類で、Codex には実装（GPT-5.6 Luna）と画像生成（GPT Image 2.5）を、Gemini には日本語の文章を任せます。ローカルの Qwen は機密を含む読み取り調査のために用意していますが、実際の出番は少なく、記録上は0回です。quasar・GLM・gemini-probe は検証のために接続しただけで、実運用では使っていません。</p>
+          <ul class="chips"><li class="key">委任の大半は Claude 内</li><li class="key">Codex＝実装＋画像生成</li><li>Gemini＝日本語の文章</li><li>Qwen＝機密の調査用</li><li>検証用 3本</li></ul>
           <div class="sample">
             <div class="sample-head"><h4>実例</h4><span class="fn">Agent() → 別モデル</span></div>
-<pre><code>Agent(<span class="k">qwen-local-worker</span>)     ← "hooks の一覧を読み取り専用で棚卸し"   <span class="c">// ローカル・待てるとき</span>
-Agent(<span class="k">gemini-probe-worker</span>)   ← "この設計の該当箇所を急ぎで調査"       <span class="c">// 外部・数十秒</span>
-Agent(<span class="k">luna-codex-worker</span>)     ← "このバグを直してテストを更新"         <span class="c">// 外部・区切られた実装</span>
-Agent(<span class="k">codex-image-worker</span>)    ← "透過背景のUIアイコンを1枚"           <span class="c">// 外部・GPT Image 2.5</span></code></pre>
+<pre><code>Agent(<span class="k">luna-codex-worker</span>)     ← "このバグを直してテストを更新"         <span class="c">// 外部・区切られた実装</span>
+Agent(<span class="k">codex-image-worker</span>)    ← "透過背景のUIアイコンを1枚"           <span class="c">// 外部・GPT Image 2.5</span>
+Agent(<span class="k">gemini-worker</span>)         ← "この段落を自然な日本語に推敲"         <span class="c">// 外部・日本語の文章</span></code></pre>
             <p class="why"><b>なぜ</b>：中量級の作業を別モデルに任せ、本流（最終判断を担うメインの Claude）の負荷を抑えます。<b>結果は「証拠」であって正しさの証明ではない</b>ため、どのモデルが実処理したかを報告に含め、確認していない検査を済んだことにしません。</p>
           </div>
-          <a class="more" href="#fig-c"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図C 委任で、7本のワーカーを見る</a>
+          <a class="more" href="#fig-c"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down-right"/></svg>図C 委任で、実際の振り先を見る</a>
         </article>
 
         <article class="layer-detail" id="layer-6" aria-labelledby="layer-6-h">
@@ -818,7 +824,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="stats" id="stats">
       <div class="stat"><span class="num" style="--to:7" aria-hidden="true"></span><span class="lbl"><span class="vh">7 </span>層</span></div>
       <div class="stat"><span class="num" style="--to:72" aria-hidden="true"></span><span class="lbl"><span class="vh">72 </span>スキル</span></div>
-      <div class="stat"><span class="num" style="--to:62" aria-hidden="true"></span><span class="lbl"><span class="vh">62 </span>助っ人AI（起動可）</span></div>
+      <div class="stat"><span class="num" style="--to:61" aria-hidden="true"></span><span class="lbl"><span class="vh">61 </span>助っ人AI（起動可）</span></div>
       <div class="stat"><span class="num" style="--to:101" aria-hidden="true"></span><span class="lbl"><span class="vh">101 </span>助っ人AI（待機）</span></div>
       <div class="stat"><span class="num" style="--to:7" aria-hidden="true"></span><span class="lbl"><span class="vh">7 </span>外部ワーカー</span></div>
       <div class="stat"><span class="num" style="--to:100" aria-hidden="true"></span><span class="lbl"><span class="vh">100 </span>記憶ファイル</span></div>
@@ -829,7 +835,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="does">
       <div><h3><svg class="icon" aria-hidden="true"><use href="#i-database"/></svg>覚えている</h3><p>過去の会話の事実や決定事項をファイルに残し、次回も参照します。</p></div>
       <div><h3><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg>眠って整理する</h3><p>会話の終わりやコンテキスト圧縮の直前に、溜まった情報の要点を記憶と看板へ書き出します。</p></div>
-      <div><h3><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>専門家と外部モデルに振る</h3><p>得意分野ごとの専門AIに加え、速さ・場所（ローカル／外部）の異なるモデルへ仕事を振り分けます。</p></div>
+      <div><h3><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>専門家と外部モデルに振る</h3><p>仕事の多くは得意分野ごとの専門AI（Claude のサブエージェント）に振り、実装と画像生成は Codex、日本語の文章は Gemini に任せます。</p></div>
       <div><h3><svg class="icon" aria-hidden="true"><use href="#i-clipboard-check"/></svg>自らを点検する</h3><p>設定の不整合を定期的に検査し、危険な操作はコードで止め、人間の確認が必要な操作では停止して問い合わせます。</p></div>
     </div>
   </div>
@@ -840,9 +846,9 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
   <div class="wrap-wide">
     <div class="fig-head">
       <p class="fig-no">図B</p>
-      <h2 id="fig-b-title">1回の会話で起きること</h2>
+      <h2 id="fig-b-title">1回の会話で<wbr>起きること</h2>
       <p class="lead">会話の場面ごとに、決まったフックが自動で実行されます。場面は左から右へ、はじまり → 準備 → 実行 → 睡眠の順に並び、各場面の下にそこで実行されるフックの名前を示しています。</p>
-      <div class="sprite" style="--w:104;--h:195;--rows:82;--hw:87;--hdx:13;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="微笑むモネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:109;--h:201;--rows:84;--hw:96;--hdx:8;--hrows:84"><img src="assets/monet/pixel/monet-smile.png" width="109" height="201" alt="微笑むモネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <ol class="scenes" aria-label="会話の流れ">
@@ -886,14 +892,14 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
     <div class="sub-block">
       <h3>モデルの使い分け（重さは難度で決める）</h3>
-      <p class="note">サブエージェントのモデルは、各定義ファイルの宣言（frontmatter）で決まり、これが唯一の既定です。呼び出し側で重いモデルに上げるのは「不可逆・共有物の設計判断」「事実の正確さが致命的」「判断軸が言語化できていない」の3条件のときだけで、軽いモデルに下げるのは自由です。処理する件数が多いことは、上げる理由になりません。下のバーは、起動可能な62体の割り当てです。</p>
+      <p class="note">サブエージェントのモデルは、各定義ファイルの宣言（frontmatter）で決まり、これが唯一の既定です。呼び出し側で重いモデルに上げるのは「不可逆・共有物の設計判断」「事実の正確さが致命的」「判断軸が言語化できていない」の3条件のときだけで、軽いモデルに下げるのは自由です。処理する件数が多いことは、上げる理由になりません。下のバーは、起動可能な61体の割り当てです。</p>
       <div class="ratio" data-reveal>
-        <div class="ratio-track" role="img" aria-label="起動可能な62体の既定モデル：sonnet 38体、haiku 14体、opus 6体、GPT-5.6 系 4体">
-          <span class="ratio-seg s1" style="flex:38">sonnet 38</span><span class="ratio-seg s2" style="flex:14">haiku 14</span><span class="ratio-seg s3" style="flex:6">opus 6</span><span class="ratio-seg s4" style="flex:4"></span>
+        <div class="ratio-track" role="img" aria-label="起動可能な61体の既定モデル：sonnet 38体、haiku 13体、opus 6体、GPT-5.6 系 4体">
+          <span class="ratio-seg s1" style="flex:38">sonnet 38</span><span class="ratio-seg s2" style="flex:13">haiku 13</span><span class="ratio-seg s3" style="flex:6">opus 6</span><span class="ratio-seg s4" style="flex:4"></span>
         </div>
         <ul class="ratio-legend">
           <li><i style="background:var(--ink)"></i>sonnet <b>38</b>体 — 実装・レビュー・テスト</li>
-          <li><i style="background:var(--terra-deep)"></i>haiku <b>14</b>体 — 探索・中継役（ワーカーの呼び出しを中継する）</li>
+          <li><i style="background:var(--terra-deep)"></i>haiku <b>13</b>体 — 探索・中継役（ワーカーの呼び出しを中継する）</li>
           <li><i style="background:var(--grey)"></i>opus <b>6</b>体</li>
           <li><i style="background:var(--surface-2)"></i>GPT-5.6 系 <b>4</b>体</li>
         </ul>
@@ -907,21 +913,23 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
   <div class="wrap-wide">
     <div class="fig-head">
       <p class="fig-no">図C</p>
-      <h2 id="fig-c-title">誰に仕事を振るか</h2>
-      <p class="lead">真ん中の本流（メインの Claude）が最終判断を担います。左は Claude のサブエージェント、右は別のモデルに範囲を区切った仕事を1本ずつ任せる外部モデルワーカーです。ワーカーがあるという理由だけでは任せず、Haiku では力不足だが本流で処理するほどでもない中量級の仕事に限ります。ワーカーの呼び出しは軽量モデルのサブエージェントが中継し、実際の処理は各ワーカーのモデルが行います。</p>
-      <div class="sprite" style="--w:104;--h:195;--rows:82;--hw:87;--hdx:13;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="考え中のモネ（ドット絵）" loading="lazy"></div>
+      <h2 id="fig-c-title">誰に<wbr>仕事を<wbr>振るか</h2>
+      <p class="lead">真ん中の本流（メインの Claude）が最終判断を担います。左は Claude のサブエージェント、右は別のモデルに範囲を区切った仕事を1本ずつ任せる外部モデルワーカーです。ほとんどの作業は本流とサブエージェント、つまり Claude の中で完結します。外部に出すのは主に、Codex への実装と画像生成、Gemini への日本語の文章です。ワーカーの呼び出しは軽量モデルのサブエージェントが中継し、実際の処理は各ワーカーのモデルが行います。</p>
+      <div class="sprite" style="--w:111;--h:206;--rows:87;--hw:98;--hdx:8;--hrows:87"><img src="assets/monet/pixel/monet-think.png" width="111" height="206" alt="考え中のモネ（ドット絵）" loading="lazy"></div>
     </div>
+
+    <p class="note" style="margin:0 0 28px">実測（委任モデルの実測ログ・9/6〜9/30）：Claude のサブエージェント 36回（general-purpose 17・research-analyst 12 ほか）、codex-image-worker 7回、gemini-worker 3回（3回とも日本語の文章）、luna-codex-worker 2回。qwen-local-worker・quasar-worker・glm-worker・gemini-probe-worker は0回です。</p>
 
     <p class="picker-label"><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>どこへ振るか（早見）— 課題の型を選ぶと、行き先まで線が引かれます</p>
     <div class="picker" role="group" aria-label="課題の型">
-      <button class="pick" type="button" aria-pressed="false" data-to="qwen-local-worker" data-alt="quasar-worker" data-say="まず <b>qwen-local-worker</b>（ローカル）。塞がっていれば <b>quasar-worker</b>（破線）。">待てる読み取り調査</button>
-      <button class="pick" type="button" aria-pressed="false" data-to="gemini-probe-worker" data-say="<b>gemini-probe-worker</b>（数十秒。外部・パスは渡す側が指定）">急ぐ読み取り調査</button>
-      <button class="pick" type="button" aria-pressed="false" data-to="glm-worker" data-say="<b>glm-worker</b>（推論型・待てるとき）">段階的な分析・原因追跡</button>
-      <button class="pick" type="button" aria-pressed="false" data-to="gemini-worker" data-say="<b>gemini-worker</b>（最速。必要な情報は依頼文に書き込む）">文章を書く</button>
-      <button class="pick" type="button" aria-pressed="false" data-to="luna-codex-worker" data-say="<b>luna-codex-worker</b>（GPT-5.6 Luna）">区切られた実装・修正</button>
+      <button class="pick" type="button" aria-pressed="false" data-to="general" data-say="<b>Claude のサブエージェント</b>（general-purpose・research-analyst など）。これが既定です。">調べもの・読み取り調査</button>
+      <button class="pick" type="button" aria-pressed="false" data-to="qwen-local-worker" data-say="<b>qwen-local-worker</b>（ローカル。マシンの外へ出さない）">機密を含む調査</button>
+      <button class="pick" type="button" aria-pressed="false" data-to="stack" data-say="<b>現役スタックの専門AI</b>（Claude のサブエージェント）">実装・レビュー</button>
+      <button class="pick" type="button" aria-pressed="false" data-to="luna-codex-worker" data-say="<b>luna-codex-worker</b>（GPT-5.6 Luna。目的と受入条件が明確なとき）">区切られた実装を外へ任せる</button>
+      <button class="pick" type="button" aria-pressed="false" data-to="gemini-worker" data-say="<b>gemini-worker</b>（必要な情報は依頼文に書き込む）">日本語の文章を書く</button>
       <button class="pick" type="button" aria-pressed="false" data-to="codex-image-worker" data-say="<b>codex-image-worker</b>（GPT Image 2.5・ローカル GPU 不使用）">画像を1枚作る</button>
     </div>
-    <p class="pick-result" id="pick-result" aria-live="polite">迷ったらローカルから試します。</p>
+    <p class="pick-result" id="pick-result" aria-live="polite">迷ったら Claude のサブエージェントに任せます。</p>
 
     <div class="graph" id="graph">
       <svg class="graph-lines" id="graph-lines" aria-hidden="true"></svg>
@@ -937,6 +945,11 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
             <li><b>Tier 3 作業</b><span>refactoring-specialist / api-designer / documentation-engineer / dx-optimizer</span></li>
             <li><b>Tier 4 思考補助</b><span>research-analyst / project-idea-validator / prompt-engineer</span></li>
           </ul>
+          <span class="light go"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>緑</span>
+        </div>
+        <div class="node" data-node="general">
+          <span class="nm">汎用・調査の助っ人AI</span>
+          <span class="sub">general-purpose・research-analyst など。調べものの既定の行き先</span>
           <span class="light go"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>緑</span>
         </div>
         <div class="node" data-node="stack">
@@ -960,7 +973,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
       </div>
 
       <div class="branch" aria-label="外部モデルワーカー">
-        <p class="branch-title">外部モデルワーカー 7本（＋停止中 1本）</p>
+        <p class="branch-title">外部モデルワーカー 7本（うち検証用 3本）</p>
         <div class="workers">
           <div class="group">
             <span class="group-title">Codex の2本柱 — 実装と画像</span>
@@ -976,35 +989,33 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
             </button>
           </div>
           <button class="node worker" type="button" data-node="qwen-local-worker" aria-expanded="false" aria-controls="worker-detail">
-            <span><span class="nm">qwen-local-worker</span><span class="sub">Qwen3.8 27B — 機密を含む調査はここだけ</span></span>
+            <span><span class="nm">qwen-local-worker</span><span class="sub">Qwen3.8 27B — 機密を含む調査用。出番は少ない</span></span>
             <span class="speed"><span>待てるとき向け</span></span>
             <span class="tags"><span class="t local">ローカル</span><span class="t">読み取り</span></span>
           </button>
           <button class="node worker" type="button" data-node="gemini-worker" aria-expanded="false" aria-controls="worker-detail">
-            <span><span class="nm">gemini-worker</span><span class="sub">Gemini — 散文・下書き・翻訳・要約</span></span>
+            <span><span class="nm">gemini-worker</span><span class="sub">Gemini — 日本語の文章（下書き・推敲・監査の比較）</span></span>
             <span class="speed" data-lo="8" data-hi="13"><span>8〜13秒</span><span class="meter"><i></i></span></span>
             <span class="tags"><span class="t ext">外部</span><span class="t">文章生成</span></span>
           </button>
+          <div class="group trial">
+            <span class="group-title">検証用 — 接続しただけで実運用では使っていない</span>
           <button class="node worker" type="button" data-node="gemini-probe-worker" aria-expanded="false" aria-controls="worker-detail">
-            <span><span class="nm">gemini-probe-worker</span><span class="sub">Gemini — 急ぎの読み取り調査</span></span>
+            <span><span class="nm">gemini-probe-worker</span><span class="sub">Gemini — 急ぎの読み取り調査（検証用）</span></span>
             <span class="speed" data-lo="24" data-hi="26"><span>24〜26秒</span><span class="meter"><i></i></span></span>
             <span class="tags"><span class="t ext">外部</span><span class="t">読み取り</span></span>
           </button>
           <button class="node worker" type="button" data-node="glm-worker" aria-expanded="false" aria-controls="worker-detail">
-            <span><span class="nm">glm-worker</span><span class="sub">glm-5-3（推論）— 段階的な分析</span></span>
+            <span><span class="nm">glm-worker</span><span class="sub">glm-5-3（推論）— 段階的な分析（検証用）</span></span>
             <span class="speed slow" data-lo="218" data-hi="218"><span>約218秒</span><span class="meter"><i></i></span></span>
             <span class="tags"><span class="t ext">外部</span><span class="t">推論</span></span>
           </button>
           <button class="node worker" type="button" data-node="quasar-worker" aria-expanded="false" aria-controls="worker-detail">
-            <span><span class="nm">quasar-worker</span><span class="sub">quasar-438b — 待てる読み取り調査</span></span>
+            <span><span class="nm">quasar-worker</span><span class="sub">quasar-438b — 待てる読み取り調査（検証用）</span></span>
             <span class="speed slow" data-lo="310" data-hi="310"><span>約310秒</span><span class="meter"><i></i></span></span>
             <span class="tags"><span class="t ext">外部</span><span class="t">読み取り</span></span>
           </button>
-          <button class="node worker off" type="button" data-node="comfy-image-worker" aria-expanded="false" aria-controls="worker-detail">
-            <span><span class="nm">comfy-image-worker</span><span class="sub">ローカル画像生成 — 使用停止中</span></span>
-            <span class="speed"><span>停止中</span></span>
-            <span class="tags"><span class="t local">ローカル</span><span class="t">停止中</span></span>
-          </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1026,9 +1037,9 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
   <div class="wrap-wide">
     <div class="fig-head">
       <p class="fig-no">図D</p>
-      <h2 id="fig-d-title">判断のルール — 自律の範囲</h2>
+      <h2 id="fig-d-title">判断のルール<wbr> — 自律の範囲</h2>
       <p class="lead">AIが自分で決めてよい範囲の線引きです。信号機の色で「自ら決定してよい／確認のうえ実行／絶対に行わない」を区分します。判定は上から順に進み、まず「常に赤」に当たるかを見て、当たらなければ可逆性×影響範囲の表で決めます。どれに当たるか迷う操作は黄（確認）として扱います。</p>
-      <div class="sprite" style="--w:100;--h:191;--rows:80;--hw:92;--hdx:4;--hrows:65"><img src="assets/monet/pixel/monet-point.png" width="100" height="191" alt="指さしで説明するモネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:100;--h:191;--rows:80;--hw:94;--hdx:2;--hrows:80"><img src="assets/monet/pixel/monet-point.png" width="100" height="191" alt="指さしで説明するモネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <div class="always-red">
@@ -1038,8 +1049,11 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         <li>認証情報の送信・露出</li>
         <li>課金・資金移動</li>
         <li>メインブランチの破壊的 Git 操作</li>
+        <li>外部への意図しない書き込み</li>
         <li>ローカルで処理できるファイルの外部アップロード</li>
         <li>public リポジトリへの push</li>
+        <li>重要ファイルの削除（設定・CLAUDE.md・認証情報・人格・利用者の記憶）</li>
+        <li>rm -rf・find -delete（承認済みの月次整理だけ例外）</li>
       </ul>
     </div>
     <p class="order-arrow"><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg>当てはまらなければ、下の表で判定する</p>
@@ -1059,7 +1073,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
     <div class="cell-out" id="cell-out" aria-live="polite"><p class="hint">マスを選ぶと、その色に当たる操作が出ます。</p></div>
     <template id="tpl-go"><h4><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>緑 — 無確認で実行可</h4><p>自らの判断で実行し、完了後に1行で報告します。</p><ul><li>ファイルの読み取り・検索</li><li>看板・受け渡しフォルダの更新</li><li>記憶の追加</li><li>基本14体・現役スタックの助っ人AI</li><li>外部ワーカーの単独起動</li></ul></template>
     <template id="tpl-ask"><h4><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"/></svg>黄 — 要確認</h4><p>選択肢を2〜4個提示し、いったん停止して確認します。承認後は緑として実行します。</p><ul><li>スキル・エージェント・設定の編集</li><li>プロジェクト本体の変更・commit・push</li><li>3体以上の多重起動・Workflow</li><li>現役スタック外の助っ人AI</li></ul></template>
-    <template id="tpl-stop"><h4><svg class="icon" aria-hidden="true"><use href="#i-octagon-alert"/></svg>赤 — 絶対禁止</h4><p>いかなる状況でも実行せず、依頼があっても理由を返して停止します。「常に赤」の5項目（上の帯）は、この表より先に判定されます。</p></template>
+    <template id="tpl-stop"><h4><svg class="icon" aria-hidden="true"><use href="#i-octagon-alert"/></svg>赤 — 絶対禁止</h4><p>いかなる状況でも実行せず、依頼があっても理由を返して停止します。「常に赤」の8項目（上の帯）は、この表より先に判定されます。</p></template>
 
     <p class="note">「好きにやっていい」のような汎用的な励ましは、設定やスキルの自己改変の承認にはなりません。応答できない状況（就寝中など）も承認とは見なしません。</p>
 
@@ -1082,9 +1096,9 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
   <div class="wrap-wide">
     <div class="fig-head">
       <p class="fig-no">図E</p>
-      <h2 id="fig-e-title">フォルダ構成 — 実際のファイル配置</h2>
+      <h2 id="fig-e-title">フォルダ構成<wbr> — 実際の<wbr>ファイル配置</h2>
       <p class="lead">システムを構成する <span class="mono">~/.claude/</span> 配下の実際のディレクトリ構造です。右端のバッジは各ファイルが対応する層で、押すと図A のその層へ戻ります。</p>
-      <div class="sprite" style="--w:104;--h:195;--rows:82;--hw:87;--hdx:13;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="資料を持つモネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:109;--h:206;--rows:87;--hw:98;--hdx:7;--hrows:87"><img src="assets/monet/pixel/monet-book.png" width="109" height="206" alt="本を開いて見ているモネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <div class="tree">
@@ -1106,7 +1120,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
             <li><div class="row"><span class="nm">step1.md / step2.md / naming.md / legacy.md</span><span class="a">作業文脈・命名規約・旧仕様メモ</span></div></li>
           </ul></details></li>
         <li class="group-gap"><div class="row"><span class="nm dir">skills/</span><span class="a">72スキルの定義（一部は ChatGPT 側と symlink で共有）</span><button class="lyr" type="button" data-goto="4">層④</button></div></li>
-        <li><div class="row"><span class="nm dir">agents/</span><span class="a">起動可能な62体の定義（ワーカー8体は別置きの実体へ symlink）</span><button class="lyr" type="button" data-goto="4">層④</button></div></li>
+        <li><div class="row"><span class="nm dir">agents/</span><span class="a">起動可能な61体の定義（ワーカー7体は別置きの実体へ symlink）</span><button class="lyr" type="button" data-goto="4">層④</button></div></li>
         <li><div class="row"><span class="nm dir">agent-library/</span><span class="a">待機中の101体</span><button class="lyr" type="button" data-goto="4">層④</button></div></li>
         <li class="group-gap"><details open data-sp-close><summary><div class="row"><span class="nm dir">hooks/ ・ scripts/</span><span class="a">フックと、その本体（Python / シェル）</span><button class="lyr" type="button" data-goto="3">層③</button></div></summary>
           <ul>
@@ -1138,9 +1152,9 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
   <div class="wrap-wide">
     <div class="fig-head">
       <p class="fig-no">一覧</p>
-      <h2 id="lists-title">スキルと助っ人AIの一覧</h2>
+      <h2 id="lists-title">スキルと<wbr>助っ人AIの<wbr>一覧</h2>
       <p class="lead">図に出てきたスキルと助っ人AIを、すべて一覧にしています。名前や説明で絞り込めます。</p>
-      <div class="sprite" style="--w:104;--h:195;--rows:82;--hw:87;--hdx:13;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="モネ（ドット絵）" loading="lazy"></div>
+      <div class="sprite" style="--w:117;--h:206;--rows:87;--hw:112;--hdx:0;--hrows:87"><img src="assets/monet/pixel/monet-present.png" width="117" height="206" alt="こちらですと手で示すモネ（ドット絵）" loading="lazy"></div>
     </div>
 
     <div class="lists">
@@ -1152,8 +1166,8 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
         <div class="list-scroll" id="skill-list"></div>
       </div>
       <div class="list-panel" data-list="agents">
-        <h3>助っ人AI <span class="cnt">62＋待機101</span></h3>
-        <p>必要なときだけ呼び出す専門AIです。起動可の62体は定義済みで、現在主に使う技術に一致するものは確認なしで起動できます。待機の101体は別置きの棚（agent-library）にあり、必要になったときだけ呼び出します。</p>
+        <h3>助っ人AI <span class="cnt">61＋待機101</span></h3>
+        <p>必要なときだけ呼び出す専門AIです。起動可の61体は定義済みで、現在主に使う技術に一致するものは確認なしで起動できます。待機の101体は別置きの棚（agent-library）にあり、必要になったときだけ呼び出します。</p>
         <label class="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span class="vh">助っ人AIを絞り込み</span><input type="search" id="agent-search" placeholder="名前・分野・役割（例: react / security / レビュー）" autocomplete="off"><output id="agent-count" for="agent-search"></output></label>
         <div class="filters" id="agent-filters" role="group" aria-label="助っ人AIの区分"></div>
         <div class="list-scroll" id="agent-list"></div>
@@ -1201,7 +1215,7 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
 
 <footer class="site-foot">
   <div class="wrap-wide foot-grid">
-<div class="sprite" style="--w:104;--h:195;--rows:82;--hw:87;--hdx:13;--hrows:66"><img src="assets/monet/pixel/monet-idle.png" width="104" height="195" alt="モネ（ドット絵）" loading="lazy"></div>
+<div class="sprite" style="--w:106;--h:195;--rows:82;--hw:95;--hdx:6;--hrows:82"><img src="assets/monet/pixel/monet-wave.png" width="106" height="195" alt="手を振るモネ（ドット絵）" loading="lazy"></div>
     <div>
       <p class="foot-q">静かに壊れない構成を目指しています。</p>
       <p class="foot-p">「自律型AIエージェント組織」という考え方を、個人の運用に落とし込んだ構成です。記録による引き継ぎ・睡眠による整理・定期点検によって、会話を重ねても設定や記憶の不整合が放置されないようにしています。案内役のモネは、この構成の上で実際に動いている人格です。</p>
@@ -1391,14 +1405,13 @@ document.querySelectorAll('main > section').forEach(s => navIO.observe(s));
 
 /* ======================= 図C: 委任グラフ ======================= */
 const WORKERS = {
-  'luna-codex-worker': {d:'区切られた実装・バグ修正・リファクタ・テスト更新。Codex CLI 経由で GPT-5.6 Luna が実処理します。Codex の柱1（実装）。', s:'実装の規模しだい', b:'目的と受入条件が明確なときだけ'},
-  'codex-image-worker': {d:'GPT Image 2.5 で画像を1枚生成（UIアイコン・テクスチャ・背景・参考画像・サムネイル）。生成は OpenAI 側で行われ、ローカル GPU は使いません。透過指定に対応し、不透明で返ったら再生成します。Codex の柱2（画像生成）。', s:'実測 40〜75秒／枚', b:'使う前に画像を目で確認する'},
-  'qwen-local-worker': {d:'ローカルの Qwen3.8 27B による読み取り専用の探索・要約・棚卸し・一次比較。マシンの外へ出ないため、機密を含む調査はここだけです。', s:'待てるとき向け・単一スロット', b:'塞がっていれば Luna か本流へ戻す'},
-  'gemini-worker': {d:'Gemini（Antigravity CLI）で散文・下書き・翻訳・書き直し・要約を1本書く。全ツールを無効化しており、ファイルは読めません（必要な情報は依頼文に書き込む）。', s:'実測 8〜13秒', b:'利用者を待たせる場面でも使える唯一の外部ワーカー'},
-  'gemini-probe-worker': {d:'Gemini による急ぎの読み取り調査。フックが「読み取りツールのみ・指定ディレクトリ配下のみ」に制限し、ファイル一覧は起動時に渡します。', s:'実測 24〜26秒', b:'渡したディレクトリの外は読めない'},
-  'glm-worker': {d:'CompactifAI の glm-5-3（推論モデル）による段階的な分析・原因追跡・構造レビューの一次案。', s:'遅い（実測 約218秒）', b:'待たされてよい非同期の調査専用'},
-  'quasar-worker': {d:'CompactifAI の quasar-438b による、待てる読み取り調査（探索・要約・棚卸し・一次比較）。ローカルが塞がっているときの受け皿です。', s:'遅い（実測 約310秒）', b:'待たされてよい非同期の調査専用'},
-  'comfy-image-worker': {d:'ローカルで画像を生成する別系統。実行すると開発環境（WSL）ごと停止する不具合が起きたため、原因が分かるまで使用停止としています。', s:'停止中', b:'画像は codex-image-worker が担う'}
+  'luna-codex-worker': {d:'区切られた実装・バグ修正・リファクタ・テスト更新。Codex CLI 経由で GPT-5.6 Luna が実処理します。Codex の柱1（実装）。実測では2回です。', s:'実装の規模しだい', b:'目的と受入条件が明確なときだけ'},
+  'codex-image-worker': {d:'GPT Image 2.5 で画像を1枚生成（UIアイコン・テクスチャ・背景・参考画像・サムネイル）。生成は OpenAI 側で行われ、ローカル GPU は使いません。透過指定に対応し、不透明で返ったら再生成します。Codex の柱2（画像生成）。実測では7回で、外部ワーカーの中で最多です。', s:'実測 40〜75秒／枚', b:'使う前に画像を目で確認する'},
+  'qwen-local-worker': {d:'ローカルの Qwen3.8 27B による読み取り専用の調査。マシンの外へ出ないため、機密を含む調査の行き先として用意しています。普段の調査は Claude のサブエージェントで足りており、実測の記録では0回です。', s:'待てるとき向け・単一スロット', b:'機密を含む調査はここだけ。塞がっていれば本流へ戻す'},
+  'gemini-worker': {d:'Gemini（Antigravity CLI）に日本語の文章を書かせます。用途は下書き・推敲・監査の比較に絞っています。全ツールを無効化しているため、ファイルは読めません（必要な情報は依頼文に書き込む）。実測では3回で、3回とも日本語の文章でした。', s:'実測 8〜13秒', b:'外部 API のため、機密は依頼文に載せない'},
+  'gemini-probe-worker': {d:'検証のために接続しただけで、実運用では使っていません。Gemini による急ぎの読み取り調査で、フックが「読み取りツールのみ・指定ディレクトリ配下のみ」に制限し、ファイル一覧は起動時に渡します。', s:'実測 24〜26秒', b:'渡したディレクトリの外は読めない'},
+  'glm-worker': {d:'検証のために接続しただけで、実運用では使っていません。CompactifAI の glm-5-3（推論モデル）による段階的な分析・原因追跡・構造レビューの一次案を想定したワーカーです。', s:'遅い（実測 約218秒）', b:'待たされてよい非同期の調査専用'},
+  'quasar-worker': {d:'検証のために接続しただけで、実運用では使っていません。CompactifAI の quasar-438b による、待てる読み取り調査（探索・要約・棚卸し・一次比較）を想定したワーカーです。', s:'遅い（実測 約310秒）', b:'待たされてよい非同期の調査専用'}
 };
 const graph = document.getElementById('graph');
 const graphSvg = document.getElementById('graph-lines');
@@ -1468,7 +1481,7 @@ document.querySelectorAll('.pick').forEach(btn => btn.addEventListener('click', 
   } else {
     pick = null;
     graph.classList.remove('has-pick');
-    document.getElementById('pick-result').textContent = '迷ったらローカルから試します。';
+    document.getElementById('pick-result').textContent = '迷ったら Claude のサブエージェントに任せます。';
   }
   drawGraph(true);
 }));
@@ -1477,6 +1490,8 @@ const workerDetail = document.getElementById('worker-detail');
 /** ワーカーの詳細（説明・速さ・境界）をグラフの下に出す。同じものをもう一度押すと閉じる。 */
 function showWorker(id, toggle){
   const btn = graph.querySelector(`.worker[data-node="${id}"]`);
+  // 早見の行き先が Claude 側のノードのときは、ワーカーの詳細を閉じるだけ
+  if(!btn){ graph.querySelectorAll('.worker').forEach(w => w.setAttribute('aria-expanded', 'false')); workerDetail.hidden = true; return; }
   const open = toggle ? btn.getAttribute('aria-expanded') !== 'true' : true;
   graph.querySelectorAll('.worker').forEach(w => w.setAttribute('aria-expanded', 'false'));
   if(!open){ workerDetail.hidden = true; return; }
@@ -1524,7 +1539,7 @@ const SKILLS=[
  {g:"Supabase 監査・支援（26）",items:[["supabase","Supabase 全般の操作・参照"],["supabase-pentest","Supabase セキュリティ監査を段階実行で統括する"],["supabase-detect","対象プロジェクトの検出"],["supabase-help","Supabase 監査の使い方案内"],["supabase-postgres-best-practices","Postgres の性能・設計のベストプラクティス"],["supabase-extract-url","接続先URLの抽出"],["supabase-extract-anon-key","公開キーの抽出（自分の環境の点検用）"],["supabase-extract-service-key","サービスキーの露出有無の点検"],["supabase-extract-jwt","JWT の抽出・検査"],["supabase-extract-db-string","DB接続文字列の露出有無の点検"],["supabase-audit-auth-config","認証設定の監査"],["supabase-audit-auth-signup","サインアップ設定の監査"],["supabase-audit-auth-users","ユーザー情報の露出監査"],["supabase-audit-authenticated","認証済みロールの権限監査"],["supabase-audit-rls","行レベルセキュリティの監査"],["supabase-audit-rpc","RPC 関数の公開範囲の監査"],["supabase-audit-functions","データベース関数の監査"],["supabase-audit-realtime","Realtime の公開範囲の監査"],["supabase-audit-tables-list","テーブル一覧の列挙"],["supabase-audit-tables-read","テーブルの読み取り可否の監査"],["supabase-audit-buckets-list","ストレージバケットの列挙"],["supabase-audit-buckets-public","公開バケットの監査"],["supabase-audit-buckets-read","バケットの読み取り可否の監査"],["supabase-evidence","監査の証跡の記録"],["supabase-report","監査レポートの生成"],["supabase-report-compare","監査レポート同士の差分比較"]]}
 ];
 const AGENTS=[
- ["起動可 · 外部モデルワーカー",[["luna-codex-worker","GPT-5.6 Luna（Codex経由）へ区切られた実装を渡す中継役"],["qwen-local-worker","ローカル Qwen3.8 27B の読み取り専用調査ワーカー"],["gemini-worker","Gemini の文章生成ワーカー（最速・ファイルは読めない）"],["gemini-probe-worker","Gemini の急ぎの読み取り調査ワーカー"],["quasar-worker","quasar-438b の待てる読み取り調査ワーカー"],["glm-worker","glm-5-3（推論型）の段階的分析ワーカー"],["codex-image-worker","Codex 経由の GPT Image 2.5 画像生成ワーカー（1枚ずつ）"],["comfy-image-worker","ローカル画像生成ワーカー（停止中・使用しない）"]]],
+ ["起動可 · 外部モデルワーカー",[["luna-codex-worker","GPT-5.6 Luna（Codex経由）へ区切られた実装を渡す中継役"],["qwen-local-worker","ローカル Qwen3.8 27B の読み取り専用調査ワーカー（機密を含む調査用・出番は少ない）"],["gemini-worker","Gemini に日本語の文章を書かせるワーカー（ファイルは読めない）"],["gemini-probe-worker","Gemini の急ぎの読み取り調査ワーカー（検証用・実運用では未使用）"],["quasar-worker","quasar-438b の待てる読み取り調査ワーカー（検証用・実運用では未使用）"],["glm-worker","glm-5-3（推論型）の段階的分析ワーカー（検証用・実運用では未使用）"],["codex-image-worker","Codex 経由の GPT Image 2.5 画像生成ワーカー（1枚ずつ）"]]],
  ["起動可 · GPT チーム（claudex 会話専用）",[["terra-architect","claudex 会話専用: GPT-5.6 Terra による設計・分析"],["luna-implementer","claudex 会話専用: GPT-5.6 Luna による実装"],["sol-reviewer","claudex 会話専用: GPT-5.6 Sol による最終レビュー"],["model-team-guide","Sol・Terra・Luna の3体チームの使い分け案内"]]],
  ["起動可 · 小説執筆チーム",[["novel-character-developer","小説: キャラクターの造形"],["novel-continuity-editor","小説: 設定・時系列の整合チェック"],["novel-planner","小説: 全体の企画・構成"],["novel-plot-architect","小説: プロットの設計"],["novel-revision-doctor","小説: 推敲・改稿の診断"],["novel-scene-writer","小説: 場面の執筆"],["novel-worldbuilder","小説: 世界観の構築"]]],
  ["起動可 · A. 言語特化",[["typescript-pro","TypeScriptの型システム・型安全を突き詰める"],["javascript-pro","最新JavaScript・非同期・性能の最適化"],["node-specialist","Node.jsのAPI・CLI・バックエンド"],["python-pro","型安全なPython・非同期・複雑なアプリ"]]],
@@ -1575,7 +1590,7 @@ function setupList(cfg){
     `<section class="lgrp" data-f="${esc(filterOf(name))}"><h4>${esc(name.replace(/（\d+）$/,''))}<span>${items.length}</span></h4><ul>` +
     items.map(([nm, rl]) => `<li data-k="${esc((nm+' '+rl).toLowerCase())}"><span class="nm">${esc(nm)}</span><span>${esc(rl)}</span></li>`).join('') +
     `</ul></section>`).join('') +
-    `<div class="empty" hidden><img src="assets/monet/cut/face-worry.webp" alt="" width="64" height="64"><p>一致するものがありません。語を短くするか、絞り込みを「すべて」に戻してください。</p></div>`;
+    `<div class="empty" hidden><div class="sprite" style="--w:100;--h:187;--rows:56;--s:2;border:0"><img src="assets/monet/pixel/monet-worry.png" width="100" height="187" alt=""></div><p>一致するものがありません。語を短くするか、絞り込みを「すべて」に戻してください。</p></div>`;
   let filter = 'すべて';
   filterBox.innerHTML = ['すべて', ...filterNames].map(f => `<button class="filter" type="button" aria-pressed="${f==='すべて'}">${esc(f)}</button>`).join('');
   const empty = host.querySelector('.empty');
