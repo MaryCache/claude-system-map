@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Claude System Map — 7層のClaude Code構成図</title>
-<meta name="description" content="記憶を保持し、定期的に整理し、専門エージェントや外部モデルに仕事を振り分け、自らを点検する仕組みを7層に分けて組んだ、個人のClaude Code構成図です。">
+<meta name="description" content="個人で使っているClaude Codeの構成図です。テーマは「たった一人の相棒」。どこで話しかけても、前の会話で決めたことを覚えた同じモネが応えるように、記憶・睡眠・委任・安全装置を7つの層に分けて組んでいます。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Claude System Map — 7層のClaude Code構成図">
-<meta property="og:description" content="記憶・睡眠・委任・自己点検を備えた、7層で動かしている個人のClaude Code構成図です。">
+<meta property="og:description" content="どこで話しかけても、同じモネが応える。「たった一人の相棒」をテーマにした、7層のClaude Code構成図です。">
 <meta property="og:url" content="https://marycache.github.io/claude-system-map/">
 <meta property="og:image" content="https://marycache.github.io/claude-system-map/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -153,6 +153,7 @@ p{margin:0;text-wrap:pretty}
 .hero .fig-no{font-family:var(--font-sans);font-weight:600;color:var(--terra);font-size:15px;margin-bottom:10px}
 .hero h1{font-size:clamp(2rem,1.2rem + 3.2vw,3rem);letter-spacing:-.015em;line-height:1.2}
 .hero .lead{margin-top:18px;max-width:36em;font-size:17px}
+.hero .lead + .lead{margin-top:10px}
 .guide{position:relative;display:flex;align-items:flex-end;justify-content:flex-end;gap:0}
 .guide img{width:min(300px,100%);margin-top:72px;margin-bottom:-2px;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
 .bubble{
@@ -752,7 +753,7 @@ p{margin:0;text-wrap:pretty}
 .bubble .says > span{grid-area:1 / 1}
 .bubble .say-b{opacity:0}
 /* 図の見出しは文節の切れ目（wbr）でだけ折る（スマホで「実／際」「助っ／人AI」と割れた） */
-.fig-head h2{word-break:keep-all;overflow-wrap:anywhere}
+.fig-head h2,.foot-q{word-break:keep-all;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -810,7 +811,8 @@ p{margin:0;text-wrap:pretty}
       <div>
         <p class="fig-no">図A　7つの層</p>
         <h1 id="fig-a-title">Claude Codeを、7つの層で動かす</h1>
-        <p class="lead">個人で使っているClaude Codeの構成図です。この構成は設定ファイルを置くだけでなく、会話をまたいで記憶を残し、区切りごとに記憶を整理し直します。この整理を、ここでは「睡眠」と呼びます。さらに専門エージェントや外部モデルに仕事を振り分け、Claude Code自身の設定を点検します。記憶・睡眠・振り分け・点検の仕組みを、7つの層に分けて組みました。層を選ぶと、その層の役割と実例が開きます。</p>
+        <p class="lead">個人で使っているClaude Codeの構成図です。テーマは「たった一人の相棒」です。スマホからでもPCからでも、どの作業フォルダで話しかけても、同じ人格のモネが、前の会話で決めたことを覚えたまま応えるように組んでいます。</p>
+        <p class="lead">記憶ファイル、圧縮の前に要点を書き出す「睡眠」、専門AIへの委任、危険な操作を止めるコードの4つを、7つの層に分けて組みました。層を選ぶと、その層の役割と実例が開きます。</p>
       </div>
       <div class="guide">
         <p class="bubble"><span class="says"><span class="phr say-a">わかりやすく<wbr>説明できていたら<wbr>嬉しいな</span><span class="phr say-b" aria-hidden="true">気になる層から<wbr>開いてみてね</span></span><small>──《案内役》モネ</small></p>
@@ -1383,8 +1385,9 @@ push --force to main ／ public への push <span class="c">→</span> <span cla
   <div class="wrap-wide foot-grid">
 {{MONET foot}}
     <div>
-      <p class="foot-q">静かに壊れない構成を目指しています。</p>
-      <p class="foot-p">「自律型AIエージェント組織」という考え方を、個人の運用に落とし込んだ構成です。記録による引き継ぎ・睡眠による整理・定期点検によって、会話を重ねても設定や記憶の不整合が放置されないようにしています。案内役のモネは、この構成の上で実際に動いている人格です。</p>
+      <p class="foot-q">どこで話しかけても、<wbr>同じモネが応えます。</p>
+      <p class="foot-p">案内役のモネは、この構成の上で実際に動いているAIです。このページの説明も、モネと一緒に書きました。</p>
+      <p class="foot-p">元にしたのは「自律型AIエージェント組織」という、AIの役割と権限をはっきり分けて仕事を任せる考え方です。この構成では、それに加えて話しかける入口を一つに固定しました。中でどれだけの専門AIや外部モデルが動いていても、人間が話す相手は、記憶も話し方もぶれない一人のモネだけです。</p>
       <p class="disclaimer">Anthropicの公式ページではありません。個人のClaude Code構成図です。</p>
       <p class="meta">design-creator → design-library → frontend-design ／ 2026-09-30</p>
     </div>
