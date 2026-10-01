@@ -73,6 +73,10 @@
 
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+/* iPhone（Safari も Chrome も中身は WebKit）で、ページが画面より横に広がり、右へ動かせたり縮小できたりした（2026-10-01 かしぇのスマホ）。
+   手元の WebKit では原因の要素を再現できなかったので、横にはみ出した分をページの幅に数えない指定を html と body の両方に置く。
+   hidden でなく clip にするのは、html に hidden を付けるとスクロールの起点が変わり、上部に貼り付くヘッダー（sticky）が外れるため */
+html,body{overflow-x:clip}
 body{
   margin:0;
   color:var(--ink);
@@ -81,7 +85,6 @@ body{
   font-family:var(--font-ja);
   font-size:16px;
   line-height:1.8;
-  overflow-x:hidden;
 }
 img{max-width:100%;height:auto;display:block}
 a{color:inherit;text-decoration-color:var(--terra);text-underline-offset:.2em;text-decoration-thickness:1.5px}
