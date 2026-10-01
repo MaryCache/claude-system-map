@@ -463,8 +463,12 @@ p{margin:0;text-wrap:pretty}
 .group-gap{margin-top:8px}
 
 /* ================= 一覧 ================= */
-.lists{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
-.list-panel{min-width:0}
+.lists{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 40px}
+/* 左右のパネルの段（見出し・説明・検索欄・絞り込み・一覧）を同じ行に乗せて縦をそろえる。
+   説明文の行数が左右で違うと、検索欄から下が1行ぶんずれた（2026-10-01 かしぇ「縦が揃ってないのがきにくわない」）。
+   subgrid が使えないブラウザでは、各パネルが今までどおり縦に積むだけになる */
+.list-panel{min-width:0;display:grid;grid-template-rows:subgrid;grid-row:span 5;align-content:start}
+.list-panel > p{align-self:start}
 .list-panel h3{font-size:20px;display:flex;align-items:baseline;gap:10px}
 .list-panel h3 .cnt{font-family:var(--font-sans);font-weight:500;color:var(--ink-dim);font-size:15px;font-variant-numeric:tabular-nums}
 .list-panel > p{font-size:14px;color:var(--ink-dim);margin-top:6px}
@@ -547,7 +551,8 @@ p{margin:0;text-wrap:pretty}
   .graph .center-col{grid-column:1 / -1;order:-1;max-width:420px;justify-self:center;width:100%}
   .bounds{grid-template-columns:repeat(2,minmax(0,1fr))}
   .bounds li:nth-child(3){padding-left:0;border-left:0}
-  .lists{grid-template-columns:minmax(0,1fr)}
+  .lists{grid-template-columns:minmax(0,1fr);row-gap:0}
+  .list-panel + .list-panel{margin-top:40px}
 }
 @media (max-width:860px){
   :root{--header-h:56px}
