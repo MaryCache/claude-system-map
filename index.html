@@ -206,7 +206,7 @@ p{margin:0;text-wrap:pretty}
 
 .detail-host{
   position:relative;background:var(--ivory);border:1px solid var(--line-strong);border-radius:var(--radius-panel);
-  padding:clamp(20px,2.4vw,28px);view-transition-name:layer-detail;
+  padding:clamp(20px,2.4vw,28px);
 }
 .detail-host .hint{color:var(--ink-dim)}
 .layer-detail + .layer-detail{margin-top:40px;padding-top:40px;border-top:1px solid var(--line)}
@@ -537,7 +537,6 @@ p{margin:0;text-wrap:pretty}
 .sheet-bar button{display:inline-flex;align-items:center;gap:6px;min-height:44px;min-width:44px;padding:0 10px;border:0;background:transparent;cursor:pointer;font-weight:500;border-radius:8px;justify-content:center}
 .sheet-body{padding:18px 18px calc(28px + env(safe-area-inset-bottom));overflow-y:auto;max-height:calc(88dvh - 58px);overscroll-behavior:contain}
 
-::view-transition-old(layer-detail),::view-transition-new(layer-detail){animation-duration:.3s;animation-timing-function:ease}
 
 /* ================= レスポンシブ ================= */
 @media (max-width:1100px){
@@ -671,8 +670,13 @@ p{margin:0;text-wrap:pretty}
 @keyframes lg-ch{0%{opacity:0;transform:translateY(30%)}20%{opacity:1}100%{opacity:1;transform:none}}
 @keyframes lg-spine{from{transform:scaleY(0)}}
 @keyframes lg-elbow{from{transform:scaleX(0)}}
-::view-transition-old(layer-detail){animation-duration:.24s;animation-timing-function:var(--ease-exit)}
-::view-transition-new(layer-detail){animation-duration:.34s;animation-timing-function:var(--ease-snap)}
+/* 層の切り替え：古い中身はすぐ消し、新しい中身だけが少し下から現れる。
+   以前は View Transitions で新旧の画像を重ねていたが、重ね合わせが明るさの足し算（plus-lighter）で、
+   新旧の長さと曲線を別々にしたため途中で白く光り、高さの違うパネルを引き伸ばして文字もゆがんだ（2026-10-01 かしぇ「発光」「目に優しくない」） */
+.layer-detail.swap-in{animation:detail-in .34s var(--ease-snap) both}
+.layer-detail.swap-in .ld-illust{animation:detail-illust .5s var(--ease-snap) .06s both}
+@keyframes detail-in{0%{opacity:0;transform:translateY(8px)}30%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes detail-illust{0%{opacity:0;transform:scale(.92) rotate(-4deg)}35%{opacity:1}100%{opacity:1;transform:none}}
 
 /* ================= 動き（ホバー・PC だけ） =================
    マウスで指せる端末に限る（タッチでは :hover が押したあと残るため）。動きを減らす設定では付けない。
@@ -1486,7 +1490,13 @@ function selectLayer(n, opt = {}){
     openSheet(n, opt.fromUser);
   } else {
     const swap = () => setActiveArticle(n);
-    if(opt.fromUser && !REDUCE && document.startViewTransition) document.startViewTransition(swap); else swap();
+    swap();
+    if(opt.fromUser && !REDUCE){
+      // 同じ層をもう一度選んでも動くよう、一度外してから付け直す。終わったら外す（ホバーの transform を妨げないため）
+      const art = document.getElementById('layer-'+n);
+      art.classList.remove('swap-in'); void art.offsetWidth; art.classList.add('swap-in');
+      art.addEventListener('animationend', e => { if(e.target === art) art.classList.remove('swap-in'); }, {once:true});
+    }
     if(opt.fromUser) history.replaceState(null, '', '#layer-'+n);
   }
   drawTrace(!!opt.fromUser);
