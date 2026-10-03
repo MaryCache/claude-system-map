@@ -54,7 +54,8 @@ s=s.replace('{{WORDMARK_SVG}}',wm)
 
 # 小さなモネ：ドット絵（assets/monet/pixel/）を優先。見出しごとに別の表情・仕草にする（かしぇ 2026-09-30）。場面に合う名前のものが無ければ monet-idle、
 # それも無ければシートの切り抜き（円の窓）に倒す。raw/ は使わない。
-pixels=sorted(p for p in glob.glob(f'{ROOT}/assets/monet/pixel/*.png'))
+# ちびモネ（monet-chibi-*）は monet mod のパネル用。名前順で先に来て見出しの立ち絵に化けるので外す
+pixels=sorted(p for p in glob.glob(f'{ROOT}/assets/monet/pixel/*.png') if 'chibi' not in os.path.basename(p))
 def pick_pixel(keys):
     for k in keys:
         for p in pixels:
